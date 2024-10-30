@@ -92,11 +92,12 @@ export const napCatReceiveToMessageElem = (data: Receive[keyof Receive]): Messag
         ...data.data,
         type: data.type,
       } as any;
+    // @ts-ignore
     case 'mface':
       return {
         type: 'image',
-        url: data.data.url,
-        file: data.data.url,
+        url: (data as any).data.url,
+        file: (data as any).data.url,
       };
     case 'at':
       const qqNum = Number(data.data.qq);

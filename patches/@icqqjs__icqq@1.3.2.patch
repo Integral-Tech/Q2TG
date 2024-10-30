@@ -104,7 +104,7 @@ index c4bdd4cde3de14d515ea55364bf6c5ba315a8281..0e1ef5aa876d8e4913dc7d41756c6170
      static deserialize(serialized: Buffer): ForwardMessage;
      constructor(proto: pb.Proto);
 diff --git a/lib/message/message.js b/lib/message/message.js
-index dcf0238de649da2c866b354a32884d0e8389ddd4..fee8ffe09e34aa3a3d7870a0d65bc793feeb29f8 100644
+index 71e477920b07fad9e7eb26c753e29e260800b189..118430564f3cdc3448977e7eb7e519973acf7458 100644
 --- a/lib/message/message.js
 +++ b/lib/message/message.js
 @@ -367,12 +367,13 @@ class ForwardMessage {

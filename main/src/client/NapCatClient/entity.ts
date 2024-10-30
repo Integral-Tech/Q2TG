@@ -4,7 +4,7 @@ import { NapCatClient } from './client';
 import { messageElemToNapCatSendable, napCatForwardMultiple, napCatReceiveToMessageElem } from './convert';
 import { getLogger, Logger } from 'log4js';
 import posthog from '../../models/posthog';
-import { Send } from 'node-napcat-ts';
+import type { Send, WSSendReturn } from 'node-napcat-ts';
 import { FileResult } from 'tmp-promise';
 
 export abstract class NapCatEntity implements QQEntity {
@@ -225,7 +225,8 @@ export class NapCatGroup extends NapCatEntity implements Group {
   };
 
   async getAllMemberInfo() {
-    return await this.client.callApi('get_group_member_list', { group_id: this.gid });
+    // lib bug
+    return await this.client.callApi('get_group_member_list', { group_id: this.gid }) as unknown as WSSendReturn['get_group_member_info'][];
   }
 }
 

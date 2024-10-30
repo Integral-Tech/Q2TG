@@ -72,10 +72,10 @@ index ff7af2d3be9b32162b5e1630d4b16ab0c7547649..f4768c29ea555638a7ebce7405bed56d
  interface FileToMediaInterface {
      file: FileLike;
 diff --git a/client/uploads.js b/client/uploads.js
-index e66e6ab97392424046fbeac2c87a43103d69c4c5..8bf408bd5b4ae71833754cf8bd57a9bdccb2760a 100644
+index 9392c42342a97ee253be8295c1a086b690673dca..3721a18b92568236faca12837b3fb074760525ec 100644
 --- a/client/uploads.js
 +++ b/client/uploads.js
-@@ -309,7 +309,7 @@ async function _fileToMedia(client, { file, forceDocument, fileSize, progressCal
+@@ -316,7 +316,7 @@ async function _fileToMedia(client, { file, forceDocument, fileSize, progressCal
  }
  exports._fileToMedia = _fileToMedia;
  /** @hidden */
@@ -84,7 +84,7 @@ index e66e6ab97392424046fbeac2c87a43103d69c4c5..8bf408bd5b4ae71833754cf8bd57a9bd
      entity = await client.getInputEntity(entity);
      let files = [];
      if (!Array.isArray(file)) {
-@@ -401,13 +401,14 @@ async function _sendAlbum(client, entity, { file, caption, forceDocument = false
+@@ -408,13 +408,14 @@ async function _sendAlbum(client, entity, { file, caption, forceDocument = false
          scheduleDate: scheduleDate,
          clearDraft: clearDraft,
          noforwards: noforwards,
@@ -100,7 +100,7 @@ index e66e6ab97392424046fbeac2c87a43103d69c4c5..8bf408bd5b4ae71833754cf8bd57a9bd
      if (!file) {
          throw new Error("You need to specify a file");
      }
-@@ -437,6 +438,7 @@ async function sendFile(client, entity, { file, caption, forceDocument = false,
+@@ -444,6 +445,7 @@ async function sendFile(client, entity, { file, caption, forceDocument = false,
              forceDocument: forceDocument,
              noforwards: noforwards,
              topMsgId: topMsgId,
@@ -108,7 +108,7 @@ index e66e6ab97392424046fbeac2c87a43103d69c4c5..8bf408bd5b4ae71833754cf8bd57a9bd
          });
      }
      if (Array.isArray(caption)) {
-@@ -484,6 +486,7 @@ async function sendFile(client, entity, { file, caption, forceDocument = false,
+@@ -491,6 +493,7 @@ async function sendFile(client, entity, { file, caption, forceDocument = false,
          scheduleDate: scheduleDate,
          clearDraft: clearDraft,
          noforwards: noforwards,
