@@ -34,19 +34,19 @@ export default new Elysia()
         const user = await member.client.pickFriend(member.uid) as NapCatFriend;
         const info = await user.renew();
         profile = {
-          // birthday: [info.birthday_year, info.birthday_month, info.birthday_day],
-          // email: info.eMail,
+          birthday: [info.birthday_year, info.birthday_month, info.birthday_day],
+          email: info.eMail,
           nickname: info.nickname,
           // @ts-ignore
-          // city: info.city || info.detail?.commonExt?.city,
+          city: info.city || info.detail?.commonExt?.city,
           QID: info.qid,
           // @ts-ignore
-          // country: info.country || info.detail?.commonExt?.country,
+          country: info.country || info.detail?.commonExt?.country || '',
           // @ts-ignore
-          // province: info.province || info.detail?.commonExt?.province,
+          province: info.province || info.detail?.commonExt?.province || '',
           signature: '',
           // @ts-ignore
-          // regTimestamp: info.regTime || info.detail?.commonExt?.regTime,
+          regTimestamp: info.regTime || info.detail?.commonExt?.regTime || '',
         } as any;
       }
       else {
