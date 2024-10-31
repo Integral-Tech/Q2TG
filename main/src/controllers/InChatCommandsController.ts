@@ -6,6 +6,7 @@ import { Api } from 'telegram';
 import flags from '../constants/flags';
 import { editFlags } from '../utils/flagControl';
 import { QQClient } from '../client/QQClient';
+import { Group } from '@icqqjs/icqq';
 
 export default class InChatCommandsController {
   private readonly service: InChatCommandsService;
@@ -107,6 +108,28 @@ export default class InChatCommandsController {
         return true;
       case '/rmq':
         await this.service.rmq(message, pair);
+        return true;
+      case '/announce':
+        if (pair.qq.dm) return;
+        if (!message.senderId.eq(this.instance.owner)) {
+          await message.reply({ message: '权限不够' });
+          return true;
+        }
+        if (!params.trim()) {
+          await message.reply({ message: '用法: /announce <内容>' });
+          return true;
+        }
+        try {
+          if(await (pair.qq as Group).announce(params.trim())) {
+            await message.reply({ message: '发送成功' });
+          }
+          else {
+            await message.reply({ message: '发送失败' });
+          }
+        }
+        catch (e) {
+          await message.reply({ message: '发送失败：' + e.message });
+        }
         return true;
     }
   };

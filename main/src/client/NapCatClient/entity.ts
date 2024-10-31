@@ -228,6 +228,13 @@ export class NapCatGroup extends NapCatEntity implements Group {
     // lib bug
     return await this.client.callApi('get_group_member_list', { group_id: this.gid }) as unknown as WSSendReturn['get_group_member_info'][];
   }
+
+  async announce(content: string): Promise<any> {
+    return await this.client.callApi('_send_group_notice', {
+      group_id: this.gid,
+      content,
+    });
+  }
 }
 
 export class NapCatGroupMember extends NapCatUser implements GroupMember {
