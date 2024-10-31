@@ -67,7 +67,7 @@ export default class {
   };
 
   private onTelegramMessage = async (message: Api.Message) => {
-    if (message.message !== '/q') return;
+    if (!['/q', `/q@${this.tgBot.me.username}`].includes(message.message)) return;
     const pair = this.instance.forwardPairs.find(message.chat);
     if (!pair) return;
     if (!message.replyTo) {
