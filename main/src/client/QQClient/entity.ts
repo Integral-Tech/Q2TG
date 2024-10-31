@@ -23,7 +23,6 @@ export interface QQEntity {
 
 export interface QQUser extends QQEntity {
   readonly uid: number;
-  readonly dm: true;
 }
 
 export interface Friend extends QQUser {
@@ -37,7 +36,6 @@ export interface Group extends QQEntity {
   readonly is_owner: boolean;
   readonly is_admin: boolean;
   readonly fs: GroupFs;
-  readonly dm: false;
 
   pickMember(uid: number, strict?: boolean): GroupMember;
 
