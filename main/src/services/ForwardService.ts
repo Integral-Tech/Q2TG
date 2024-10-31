@@ -51,6 +51,11 @@ const createTempFile = (options: Parameters<typeof createTempFileBase>[0] = {}) 
   ...options,
 });
 
+type CrhPlayerInfo = {
+  users: { id: number, name: string }[],
+  tgMessage: Api.Message,
+}
+
 // noinspection FallThroughInSwitchStatementJS
 export default class ForwardService {
   private readonly log: Logger;
@@ -117,6 +122,8 @@ export default class ForwardService {
     }
   }
 
+  private crhPlayerInfo = new Map<Pair, CrhPlayerInfo>();
+
   public async forwardFromQq(event: MessageEvent, pair: Pair) {
     const tempFiles: FileResult[] = [], messageToSend: SendMessageParams = {};
     try {
@@ -138,7 +145,7 @@ export default class ForwardService {
           messageHeaderWithLink += emoji.color(event.from.id);
         }
         messageHeader += `<b>${helper.htmlEscape(sender)}</b>: `;
-        messageHeaderWithLink += `<b><a href="${helper.generateRichHeaderUrl(pair.apiKey, event.from.id, messageHeader)}">${helper.htmlEscape(sender)}</b></a>: `;
+        messageHeaderWithLink += `<b><a href="${helper.generateRichHeaderUrl(pair.apiKey, event.from.id, messageHeader)}">${helper.htmlEscape(sender)}</a></b>: `;
       }
       const useSticker = (file: FileLike) => {
         files.push(file);
@@ -194,6 +201,33 @@ export default class ForwardService {
           message = '[<i>转发多条消息（未配置）</i>]';
         }
       };
+      const useCrhTrain = async () => {
+        let existed = this.crhPlayerInfo.get(pair);
+        if (!existed) {
+          existed = {
+            users: [],
+            tgMessage: null,
+          };
+          this.crhPlayerInfo.set(pair, existed);
+        }
+        if (!existed.users.some(it => it.id === event.from.id)) {
+          existed.users.push({ id: event.from.id, name: event.from.name });
+        }
+        const message = `<i>以下成员接了火车：</i>\n\n` + existed.users.map(it => `<b><a href="${helper.generateRichHeaderUrl(pair.apiKey, it.id)}">${it.name}</a></b>`).join('\n');
+
+        if (existed.tgMessage) {
+          try {
+            existed.tgMessage = await existed.tgMessage.edit({
+              text: message,
+            });
+          }
+          catch (e) {
+          }
+        }
+        else {
+          existed.tgMessage = await pair.tg.sendMessage(message);
+        }
+      };
       // filter chain
       const chain = event.message
         // 我们不要这些东西
@@ -227,6 +261,10 @@ export default class ForwardService {
               message += `<a href="${instantViewUrl}">\u200e</a>`;
             }
             message += helper.htmlEscape(text);
+            if (text === '[该接龙表情不支持查看，请使用QQ最新版本]') {
+              await useCrhTrain();
+              return { tgMessage: null, richHeaderUsed: false };
+            }
             break;
           }
           case 'at': {
@@ -452,6 +490,7 @@ export default class ForwardService {
             break;
         }
       }
+      this.crhPlayerInfo.delete(pair);
       message = message.trim();
       if (!event.message.length) {
         message += '<i>[消息无法解析出内容]</i>';
@@ -642,6 +681,8 @@ export default class ForwardService {
       if ((pair.flags | this.instance.flags) & flags.COLOR_EMOJI_PREFIX) {
         messageHeader = emoji.tgColor((message.sender as Api.User)?.color?.color || message.senderId.toJSNumber()) + messageHeader;
       }
+
+      this.crhPlayerInfo.delete(pair);
 
       const useImage = (image: string | Buffer, asface: boolean) => {
         chain.push({
