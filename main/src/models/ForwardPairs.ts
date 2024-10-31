@@ -24,10 +24,11 @@ export default class ForwardPairs {
     });
     for (const i of dbValues) {
       try {
-        const qq = await oicq.getChat(Number(i.qqRoomId));
+        const qq = await oicq.getChat(Number(i.qqRoomId), i.qqFromGroupId ? Number(i.qqFromGroupId) : undefined);
         const tg = await tgBot.getChat(Number(i.tgChatId));
         const tgUserChat = await tgUser.getChat(Number(i.tgChatId));
         if (qq && tg && tgUserChat) {
+          this.log.debug('初始化', { qq, tg, tgUserChat });
           this.pairs.push(new Pair(qq, tg, tgUserChat, i.id, i.flags, i.apiKey, oicq));
         }
       }
@@ -43,12 +44,13 @@ export default class ForwardPairs {
     return instance;
   }
 
-  public async add(qq: Friend | Group, tg: TelegramChat, tgUser: TelegramChat, qqClient: QQClient) {
+  public async add(qq: Friend | Group, tg: TelegramChat, tgUser: TelegramChat, qqClient: QQClient, qqFromGroupId?: number) {
     const dbEntry = await db.forwardPair.create({
       data: {
         qqRoomId: 'uid' in qq ? qq.uid : -qq.gid,
         tgChatId: Number(tg.id),
         instanceId: this.instanceId,
+        qqFromGroupId,
       },
     });
     this.pairs.push(new Pair(qq, tg, tgUser, dbEntry.id, dbEntry.flags, dbEntry.apiKey, qqClient));
@@ -81,7 +83,7 @@ export default class ForwardPairs {
   public async initMapInstance(instances: Instance[]) {
     for (const forwardPair of this.pairs) {
       for (const instance of instances) {
-        if(!(instance.oicq instanceof OicqClient)) continue;
+        if (!(instance.oicq instanceof OicqClient)) continue;
         const instanceTgUserId = instance.userMe.id.toString();
         if (forwardPair.instanceMapForTg[instanceTgUserId]) continue;
         try {

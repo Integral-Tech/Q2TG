@@ -174,16 +174,16 @@ export abstract class QQClient {
 
   // End Handlers
 
-  public getChat(roomId: number): Promise<Group | Friend> {
+  public getChat(roomId: number, tempChatFromGroupId?: number): Promise<Group | Friend> {
     if (roomId > 0) {
-      return this.pickFriend(roomId);
+      return this.pickFriend(roomId, tempChatFromGroupId);
     }
     else {
       return this.pickGroup(-roomId);
     }
   }
 
-  public abstract pickFriend(uin: number): Promise<Friend>;
+  public abstract pickFriend(uin: number, tempChatFromGroupId?: number): Promise<Friend>;
 
   public abstract pickGroup(groupId: number): Promise<Group>;
 

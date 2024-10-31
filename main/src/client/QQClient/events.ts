@@ -49,6 +49,7 @@ export class MessageEvent extends ChatEvent {
     public readonly messageId: string,
     public readonly atMe: boolean,
     public readonly atAll: boolean,
+    public readonly tempChatFromGroupId?: number,
   ) {
     super(chat);
   }

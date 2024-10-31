@@ -131,7 +131,7 @@ export default class ConfigController {
       return false;
     }
     // 有未创建转发群的新私聊消息时自动创建
-    promise = this.configService.createGroupAndLink(chat.uid, chat.remark || chat.nickname, true);
+    promise = this.configService.createGroupAndLink(chat, chat.remark || chat.nickname, true, undefined, message.tempChatFromGroupId);
     this.createPrivateMessageGroupBlockList.set(chat.uid, promise);
     await promise;
     return false;

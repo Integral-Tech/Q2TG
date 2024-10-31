@@ -92,6 +92,7 @@ model Message {
 model ForwardPair {
   id              Int               @id @default(autoincrement())
   qqRoomId        BigInt            @db.BigInt
+  qqFromGroupId   BigInt?           @db.BigInt // 用于群临时
   tgChatId        BigInt            @db.BigInt
   avatarCache     AvatarCache[]
   instanceId      Int               @default(0)

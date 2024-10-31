@@ -12,6 +12,7 @@ import getAboutText from '../utils/getAboutText';
 import random from '../utils/random';
 import { Friend, Group, QQClient } from '../client/QQClient';
 import posthog from '../models/posthog';
+import OicqClient from '../client/OicqClient';
 
 const DEFAULT_FILTER_ID = 114; // 514
 
@@ -116,10 +117,10 @@ export default class ConfigService {
    * @param status 传入 false 的话就不显示状态信息，可以传入一条已有消息覆盖
    * @param chat
    */
-  public async createGroupAndLink(room: number | Friend | Group, title?: string, status: boolean | Api.Message = true, chat?: TelegramChat) {
+  public async createGroupAndLink(room: number | Friend | Group, title?: string, status: boolean | Api.Message = true, chat?: TelegramChat, qqFromGroupId?: number) {
     this.log.info(`创建群组并关联：${room}`);
     if (typeof room === 'number') {
-      room = await this.oicq.getChat(room);
+      room = await this.oicq.getChat(room, qqFromGroupId);
     }
     if (!title) {
       // TS 这边不太智能
@@ -129,6 +130,11 @@ export default class ConfigService {
       else {
         title = room.name;
       }
+    }
+    if (!title && this.oicq instanceof OicqClient && 'uid' in room && qqFromGroupId) {
+      // 可能是群临时
+      const info = await this.oicq.oicq.getGroupMemberInfo(qqFromGroupId, room.uid);
+      title = info.card || info.nickname;
     }
     let isFinish = false;
     try {
@@ -190,7 +196,8 @@ export default class ConfigService {
       // 关联写入数据库
       const chatForBot = await this.tgBot.getChat(chat.id);
       status && await status.edit({ text: '正在写数据库…' });
-      const dbPair = await this.instance.forwardPairs.add(room, chatForBot, chat, this.oicq);
+      this.log.debug('正在写数据库:', room, chatForBot, chat, this.oicq, qqFromGroupId);
+      const dbPair = await this.instance.forwardPairs.add(room, chatForBot, chat, this.oicq, qqFromGroupId);
       isFinish = true;
 
       // 更新头像

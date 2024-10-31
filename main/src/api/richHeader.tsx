@@ -34,7 +34,9 @@ export default new Elysia()
         const user = await member.client.pickFriend(member.uid) as NapCatFriend;
         const info = await user.renew();
         profile = {
+          // @ts-ignore
           birthday: [info.birthday_year, info.birthday_month, info.birthday_day],
+          // @ts-ignore
           email: info.eMail,
           nickname: info.nickname,
           // @ts-ignore

@@ -12,7 +12,7 @@ import {
   FriendIncreaseEvent as OicqFriendIncreaseEvent,
   FriendRecallEvent,
   GroupRecallEvent,
-  FriendPokeEvent, GroupPokeEvent, MessageElem, FriendRequestEvent, GroupInviteEvent, type ImageElem, XmlElem,
+  FriendPokeEvent, GroupPokeEvent, MessageElem, FriendRequestEvent, GroupInviteEvent, type ImageElem, XmlElem, Group, Member,
 } from '@icqqjs/icqq';
 import random from '../utils/random';
 import fs from 'fs';
@@ -170,10 +170,16 @@ export default class OicqClient extends QQClient {
 
   private onMessage = async (event: PrivateMessageEvent | GroupMessageEvent | DiscussMessageEvent) => {
     if (event.message_type === 'discuss') return;
+    this.log.debug('OicqClient.onMessage', event);
+
+    let chat: Friend | Group | Member = 'group' in event ? event.group : event.friend;
+    if (event.message_type === 'private' && event.sender.group_id) {
+      chat = this.oicq.pickMember(event.sender.group_id, event.sender.user_id);
+    }
 
     const gEvent = new MessageEvent(
       { id: event.sender.user_id, name: ('card' in event.sender && event.sender.card) || event.sender.nickname },
-      'group' in event ? event.group : event.friend,
+      chat as any,
       event.message,
       event.seq,
       event.rand,
@@ -185,6 +191,7 @@ export default class OicqClient extends QQClient {
       event.message_id,
       'atme' in event ? event.atme : false,
       'atall' in event ? event.atall : false,
+      event.message_type === 'private' ? event.sender.group_id : undefined,
     );
     await this.callHandlers(this.onMessageHandlers, gEvent);
   };
@@ -289,7 +296,10 @@ export default class OicqClient extends QQClient {
     };
   }
 
-  async pickFriend(uin: number) {
+  async pickFriend(uin: number, tempChatFromGroupId?: number) {
+    if (tempChatFromGroupId) {
+      return this.oicq.pickMember(tempChatFromGroupId, uin) as any;
+    }
     return this.oicq.pickFriend(uin);
   }
 
