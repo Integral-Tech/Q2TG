@@ -67,10 +67,10 @@ export default class ForwardPairs {
   public find(target: Friend | Group | TelegramChat | Entity | number | BigInteger) {
     if (!target) return null;
     if (typeof target === 'object' && 'uid' in target) {
-      return this.pairs.find(e => 'uid' in e.qq && e.qq.uid === target.uid);
+      return this.pairs.find(e => 'uid' in e.qq && e.qq.uid === target.uid && e.qq.dm);
     }
     else if (typeof target === 'object' && 'gid' in target) {
-      return this.pairs.find(e => 'gid' in e.qq && e.qq.gid === target.gid);
+      return this.pairs.find(e => 'gid' in e.qq && e.qq.gid === target.gid && !e.qq.dm);
     }
     else if (typeof target === 'number' || 'eq' in target) {
       return this.pairs.find(e => e.qqRoomId === target || e.tg.id.eq(target));
