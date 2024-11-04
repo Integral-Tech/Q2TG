@@ -15,6 +15,7 @@ enum flags {
   DISABLE_SLASH_COMMAND = 1 << 13,
   DISABLE_RICH_HEADER = 1 << 14,
   DISABLE_OFFLINE_NOTICE = 1 << 15,
+  HIDE_ALL_QQ_NUMBER = 1 << 16,
 }
 
 export default flags;

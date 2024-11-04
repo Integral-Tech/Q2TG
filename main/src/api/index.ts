@@ -12,6 +12,7 @@ const log = getLogger('Web Api');
 let app = new Elysia()
   .onError(error => {
     log.error(error.request.method, error.request.url, error.error.message);
+    log.debug(error.error);
   })
   .get('/', () => {
     return { hello: 'Q2TG' };

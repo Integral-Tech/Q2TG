@@ -278,7 +278,7 @@ export default class ForwardService {
                 elem.text = `@${info.card || info.nickname}`;
               }
             }
-            if (env.WEB_ENDPOINT && typeof elem.qq === 'number') {
+            if (env.WEB_ENDPOINT && typeof elem.qq === 'number' && !((pair.flags | this.instance.flags) & flags.DISABLE_RICH_HEADER)) {
               message += `<a href="${helper.generateRichHeaderUrl(pair.apiKey, elem.qq)}">[<i>${helper.htmlEscape(elem.text)}</i>]</a>`;
               isContainAt = true;
               break;
