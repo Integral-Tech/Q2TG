@@ -186,20 +186,27 @@ export default {
   },
 
   getUserDisplayName(user: Entity) {
+    let res: string;
     if (!user) {
-      return '未知';
+      res = '未知';
     }
-    if ('firstName' in user) {
-      return user.firstName +
+    else if ('firstName' in user) {
+      res = user.firstName +
         (user.lastName ? ' ' + user.lastName : '');
     }
     else if ('title' in user) {
-      return user.title;
+      res = user.title;
     }
     else if ('id' in user) {
-      return user.id.toString();
+      res = user.id.toString();
     }
-    return '未知';
+    else {
+      res = '未知';
+    }
+    if (res.length > 25) {
+      res = res.slice(0, 25) + '…';
+    }
+    return res;
   },
 
   generateForwardBrief(messages: ForwardMessage[]) {
