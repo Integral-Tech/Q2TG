@@ -135,7 +135,10 @@ export const napCatReceiveToMessageElem = (data: Receive[keyof Receive]): Messag
         content: 'content' in data.data ? napCatForwardMultiple(data.data.content as any) : undefined,
       };
     case 'reply':
-      throw new Error('不出意外这个应该提前处理');
+      return {
+        type: 'reply',
+        id: data.data.id,
+      };
     default:
       throw new Error('不支持此元素');
   }
