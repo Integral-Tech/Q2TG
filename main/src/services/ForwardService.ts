@@ -601,6 +601,10 @@ export default class ForwardService {
           message && (messageToSend.message = message);
           tgMessage = await pair.tg.sendMessage(messageToSend);
         }
+        else if (messageToSend.file instanceof Api.InputMediaWebPage) {
+          delete messageToSend.file;
+          tgMessage = await pair.tg.sendMessage(messageToSend);
+        }
         else throw e;
       }
 
