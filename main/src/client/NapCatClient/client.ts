@@ -155,7 +155,8 @@ export class NapCatClient extends QQClient {
   private async handlePoke(data: WSReceiveHandler['notice.notify.poke.group'] | WSReceiveHandler['notice.notify.poke.friend']) {
     const chat = 'group_id' in data ? await this.pickGroup(data.group_id) : await this.pickFriend(data.user_id);
     const operator = 'sender_id' in data ? data.sender_id as number : data.user_id;
-    const event = new PokeEvent(chat, operator, data.target_id, '戳了戳', undefined);
+    const nors: any[] = data.raw_info?.filter(it => (it.type as any) === 'nor') || [];
+    const event = new PokeEvent(chat, operator, data.target_id, nors[0]?.txt, nors[1]?.txt);
     await this.callHandlers(this.onPokeHandlers, event);
   }
 

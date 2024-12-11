@@ -110,12 +110,12 @@ export default class InChatCommandsService {
           target = Number(dbEntry.qqSenderId);
         }
       }
-      if (qq instanceof OicqGroup && !target) {
+      if ('pokeMember' in qq && !target) {
         await message.reply({
           message: '<i>请回复一条消息</i>',
         });
       }
-      else if (qq instanceof OicqGroup) {
+      else if ('pokeMember' in qq) {
         await qq.pokeMember(target);
       }
       else {

@@ -101,6 +101,21 @@ abstract class NapCatUser extends NapCatEntity implements QQUser {
       rand: 0,
     };
   }
+
+  async poke(self?: boolean): Promise<boolean> {
+    if (self) {
+      throw new Error('NapCat 不支持自己戳自己');
+    }
+    try {
+      await this.client.callApi('friend_poke', { user_id: this.uid });
+      return true;
+    }
+    catch (e) {
+      this.logger.error('戳一戳失败', e);
+      posthog.capture('NapCat 戳一戳失败', { error: e });
+      return false;
+    }
+  }
 }
 
 export class NapCatFriend extends NapCatUser implements Friend {
@@ -234,6 +249,21 @@ export class NapCatGroup extends NapCatEntity implements Group {
       group_id: this.gid,
       content,
     });
+  }
+
+  async pokeMember(uid: number): Promise<boolean> {
+    try {
+      await this.client.callApi('group_poke', {
+        group_id: this.gid,
+        user_id: uid,
+      });
+      return true;
+    }
+    catch (e) {
+      this.logger.error('戳一戳失败', e);
+      posthog.capture('NapCat 戳一戳失败', { error: e });
+      return false;
+    }
   }
 }
 
