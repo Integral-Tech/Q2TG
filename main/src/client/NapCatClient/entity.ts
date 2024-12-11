@@ -265,6 +265,11 @@ export class NapCatGroup extends NapCatEntity implements Group {
       return false;
     }
   }
+
+  override async getFileUrl(fid: string): Promise<string> {
+    const data = await this.client.callApi('get_group_file_url', { group_id: this.gid, file_id: fid });
+    return data.url;
+  }
 }
 
 export class NapCatGroupMember extends NapCatUser implements GroupMember {

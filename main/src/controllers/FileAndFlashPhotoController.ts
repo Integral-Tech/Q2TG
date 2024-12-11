@@ -40,7 +40,10 @@ export default class FileAndFlashPhotoController {
       const fileInfo = await db.file.findFirst({
         where: { id },
       });
-      const downloadUrl = await (await this.oicq.getChat(Number(fileInfo.roomId))).getFileUrl(fileInfo.fileId);
+      const downloadUrl = new URL(await (await this.oicq.getChat(Number(fileInfo.roomId))).getFileUrl(fileInfo.fileId));
+      if (!downloadUrl.searchParams.get('fname')) {
+        downloadUrl.searchParams.set('fname', fileInfo.name);
+      }
       await message.reply({
         message: fileInfo.info + `\n<a href="${downloadUrl}">下载</a>`,
       });

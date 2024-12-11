@@ -106,10 +106,11 @@ model ForwardPair {
 }
 
 model File {
-  id     Int    @id @default(autoincrement())
-  roomId BigInt @db.BigInt
+  id     Int     @id @default(autoincrement())
+  roomId BigInt  @db.BigInt
   fileId String
   info   String
+  name   String?
 }
 
 model FlashPhoto {
