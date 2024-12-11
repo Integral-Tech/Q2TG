@@ -68,6 +68,24 @@ export const messageElemToNapCatSendable = async (elem: SendableElem): Promise<{
         } as any,
         tempFiles,
       };
+    case 'node': {
+      let message = elem.message;
+      if (!Array.isArray(message)) {
+        message = [message];
+      }
+      const forward = await Promise.all(message.map(it => messageElemToNapCatSendable(typeof it === 'string' ? { type: 'text', text: it } : it as SendableElem)));
+      return {
+        elem: {
+          type: 'node',
+          data: {
+            user_id: elem.user_id,
+            nickname: elem.nickname,
+            content: forward.map(it => it.elem),
+          },
+        } as any,
+        tempFiles: forward.flatMap(it => it.tempFiles),
+      };
+    }
     case 'sface':
     default:
       throw new Error('不支持此元素');

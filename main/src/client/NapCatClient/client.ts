@@ -1,4 +1,4 @@
-import { CreateQQClientParamsBase, Friend, FriendIncreaseEvent, Group, GroupMemberDecreaseEvent, GroupMemberIncreaseEvent, MessageEvent, MessageRecallEvent, PokeEvent, QQClient } from '../QQClient';
+import { CreateQQClientParamsBase, Friend, FriendIncreaseEvent, Group, GroupMemberDecreaseEvent, GroupMemberIncreaseEvent, MessageEvent, MessageRecallEvent, PokeEvent, QQClient, SendableElem } from '../QQClient';
 import random from '../../utils/random';
 import { getLogger, Logger } from 'log4js';
 import posthog from '../../models/posthog';
@@ -6,6 +6,7 @@ import type { Receive, WSReceiveHandler, WSSendParam, WSSendReturn } from 'node-
 import { NapCatFriend, NapCatGroup } from './entity';
 import { napCatReceiveToMessageElem } from './convert';
 import { NapCatFriendRequestEvent, NapCatGroupEvent, NapCatGroupInviteEvent } from './event';
+import type { ImageElem } from '@icqqjs/icqq';
 
 export interface CreateNapCatParams extends CreateQQClientParamsBase {
   type: 'napcat';
@@ -229,5 +230,28 @@ export class NapCatClient extends QQClient {
 
   public pickGroup(groupId: number): Promise<Group> {
     return NapCatGroup.create(this, groupId);
+  }
+
+  override async createSpoilerImageEndpoint(image: ImageElem, nickname: string, title?: string): Promise<SendableElem[]> {
+    const res: SendableElem[] = [
+      {
+        type: 'node',
+        user_id: this.uin,
+        nickname,
+        message: image,
+      },
+    ];
+    if (title) {
+      res.push({
+        type: 'node',
+        user_id: this.uin,
+        nickname,
+        message: {
+          type: 'text',
+          text: title,
+        }
+      });
+    }
+    return res;
   }
 }

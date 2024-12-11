@@ -7,6 +7,27 @@ import posthog from '../../models/posthog';
 import type { Send, WSSendReturn } from 'node-napcat-ts';
 import { FileResult } from 'tmp-promise';
 
+const createSpoilerExtra = (chain: Sendable) => {
+  if (!Array.isArray(chain)) throw new Error('喵喵喵？（!Array.isArray(chain)）');
+  const rChain = chain.filter(it => typeof it === 'object' && it.type === 'node');
+  const last = rChain[rChain.length - 1];
+  const text = (typeof last.message === 'object' && !Array.isArray(last.message) && last.message.type === 'text') ? last.message.text : '';
+  const news = [{
+    text: 'Spoiler 图片',
+  }];
+  if (text) {
+    news.push({ text });
+  }
+  news.push({
+    text: '请谨慎查看',
+  });
+  return {
+    prompt: '[Spoiler 图片]',
+    summary: 'Powered by Q2TG',
+    source: `${rChain[0].nickname}:`,
+  };
+};
+
 export abstract class NapCatEntity implements QQEntity {
   protected logger: Logger;
 
@@ -38,9 +59,9 @@ export abstract class NapCatEntity implements QQEntity {
     }
   }
 
-  protected abstract sendMsgImpl(message: Send[keyof Send][]): Promise<MessageRet>;
+  protected abstract sendMsgImpl(message: Send[keyof Send][], extra?: Record<string, any>): Promise<MessageRet>;
 
-  async sendMsg(content: Sendable, source?: Quotable): Promise<MessageRet> {
+  async sendMsg(content: Sendable, source?: Quotable, isSpoiler?: boolean): Promise<MessageRet> {
     if (!Array.isArray(content)) {
       content = [content];
     }
@@ -67,7 +88,7 @@ export abstract class NapCatEntity implements QQEntity {
       });
     }
 
-    const ret = await this.sendMsgImpl(message);
+    const ret = await this.sendMsgImpl(message, isSpoiler ? createSpoilerExtra(content) : {});
     tmpFiles.forEach(it => it.cleanup());
     return ret;
   }
@@ -88,9 +109,10 @@ abstract class NapCatUser extends NapCatEntity implements QQUser {
     super(client);
   }
 
-  protected async sendMsgImpl(message: Send[keyof Send][]): Promise<MessageRet> {
+  protected async sendMsgImpl(message: Send[keyof Send][], extra = {}): Promise<MessageRet> {
     const data = await this.client.callApi('send_private_msg', {
       user_id: this.uid,
+      ...extra,
       // @ts-ignore 库的问题
       message,
     });
@@ -183,9 +205,10 @@ export class NapCatGroup extends NapCatEntity implements Group {
     return data;
   }
 
-  protected async sendMsgImpl(message: Send[keyof Send][]): Promise<MessageRet> {
+  protected async sendMsgImpl(message: Send[keyof Send][], extra = {}): Promise<MessageRet> {
     const data = await this.client.callApi('send_group_msg', {
       group_id: this.gid,
+      ...extra,
       // @ts-ignore 库的问题
       message,
     });

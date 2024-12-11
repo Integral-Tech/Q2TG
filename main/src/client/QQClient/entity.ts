@@ -1,9 +1,9 @@
 import type { MessageElem, MessageRet, MfaceElem, Quotable } from '@icqqjs/icqq';
 import { Gender, GroupRole } from '@icqqjs/icqq/lib/common';
-import { AtElem, FaceElem, ImageElem, PttElem, TextElem, VideoElem } from '@icqqjs/icqq/lib/message/elements';
+import { AtElem, FaceElem, ForwardNode, ImageElem, PttElem, TextElem, VideoElem } from '@icqqjs/icqq/lib/message/elements';
 
 // 全平台支持的 Elem
-export type SendableElem = TextElem | FaceElem | ImageElem | AtElem | PttElem | VideoElem | MfaceElem;
+export type SendableElem = TextElem | FaceElem | ImageElem | AtElem | PttElem | VideoElem | MfaceElem | ForwardNode;
 export type Sendable = SendableElem | string | (SendableElem | string)[];
 
 export interface QQEntity {
@@ -16,7 +16,7 @@ export interface QQEntity {
 
   recallMsg(seqOrMessageId: number, rand?: number, timeOrPktNum?: number): Promise<boolean>;
 
-  sendMsg(content: Sendable, source?: Quotable): Promise<MessageRet>;
+  sendMsg(content: Sendable, source?: Quotable, isSpoiler?: boolean): Promise<MessageRet>;
 
   getFileUrl(fid: string): Promise<string>;
 }
