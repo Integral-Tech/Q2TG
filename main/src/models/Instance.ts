@@ -42,6 +42,7 @@ export default class Instance {
   public tgBot: Telegram;
   public tgUser: Telegram;
   public oicq: QQClient;
+  public isInit = false;
 
   private _ownerChat: TelegramChat;
 
@@ -165,6 +166,7 @@ export default class Instance {
         this.hugController = new HugController(this, this.tgBot, this.oicq);
       }
       this.fileAndFlashPhotoController = new FileAndFlashPhotoController(this, this.tgBot, this.oicq);
+      this.isInit = true;
     })()
       .then(() => this.log.info('初始化已完成'));
   }

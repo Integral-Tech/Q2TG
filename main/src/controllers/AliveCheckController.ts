@@ -41,7 +41,7 @@ export default class AliveCheckController {
       const tgUserName = (tgUser.me.username || tgUser.me.usernames.length) ?
         '@' + (tgUser.me.username || tgUser.me.usernames[0].username) : tgUser.me.firstName;
       messageParts.push([
-        `Instance #${instance.id}`,
+        `Instance #${instance.id} (${instance.workMode}) ${instance.isInit ? '' : '初始化未完成'}`,
 
         `QQ <code>${instance.qqUin}</code> (${oicq.constructor.name})\t` +
         `${boolToStr(await oicq.isOnline())}`,

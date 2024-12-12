@@ -7,23 +7,7 @@ const preSetupCommands = [
   }),
 ];
 
-// 这里的 group 指群组模式，Private 指在与机器人的私聊会话中
-const groupPrivateCommands = [
-  new Api.BotCommand({
-    command: 'add',
-    description: '添加新的群转发',
-  }),
-];
-
-const personalPrivateCommands = [
-  new Api.BotCommand({
-    command: 'addfriend',
-    description: '添加新的好友转发',
-  }),
-  new Api.BotCommand({
-    command: 'addgroup',
-    description: '添加新的群转发',
-  }),
+const commonPrivateCommands = [
   new Api.BotCommand({
     command: 'login',
     description: '当 QQ 处于下线状态时，使用此命令重新登录 QQ',
@@ -31,6 +15,31 @@ const personalPrivateCommands = [
   new Api.BotCommand({
     command: 'flags',
     description: 'WARNING: EXPERIMENTAL FEATURES AHEAD!',
+  }),
+  new Api.BotCommand({
+    command: 'alive',
+    description: '状态信息',
+  }),
+]
+
+// 这里的 group 指群组模式，Private 指在与机器人的私聊会话中
+const groupPrivateCommands = [
+  ...commonPrivateCommands,
+  new Api.BotCommand({
+    command: 'add',
+    description: '添加新的群转发',
+  }),
+];
+
+const personalPrivateCommands = [
+  ...commonPrivateCommands,
+  new Api.BotCommand({
+    command: 'addfriend',
+    description: '添加新的好友转发',
+  }),
+  new Api.BotCommand({
+    command: 'addgroup',
+    description: '添加新的群转发',
   }),
 ];
 
