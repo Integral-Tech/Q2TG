@@ -48,7 +48,7 @@ export default class TelegramSession extends MemorySession {
 
     if (authKey && typeof authKey === 'object') {
       this._authKey = new AuthKey();
-      await this._authKey.setKey(authKey);
+      await this._authKey.setKey(Buffer.from(authKey));
     }
     if (dcId) {
       this._dcId = dcId;

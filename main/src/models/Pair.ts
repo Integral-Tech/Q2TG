@@ -48,7 +48,7 @@ export class Pair {
     const lastHash = avatarCache ? avatarCache.hash : null;
     const avatar = await getAvatar(this.qqRoomId);
     const newHash = md5(avatar);
-    if (!lastHash || lastHash.compare(newHash) !== 0) {
+    if (!lastHash || Buffer.from(lastHash).compare(newHash) !== 0) {
       log.debug(`更新群头像: ${this.qqRoomId}`);
       await this._tg.setProfilePhoto(avatar);
       await db.avatarCache.upsert({
