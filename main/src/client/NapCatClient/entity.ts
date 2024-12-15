@@ -168,9 +168,27 @@ export class NapCatFriend extends NapCatUser implements Friend {
   }
 }
 
+class NapCatGFS implements GroupFs {
+  public constructor(private client: NapCatClient, private gid: number) {
+  }
+
+  async upload(file: string | Buffer | Uint8Array, pid?: string, name?: string, callback?: (percentage: string) => void) {
+    if (typeof file !== 'string') {
+      throw new Error('TODO');
+    }
+    return await this.client.callApi('upload_group_file', {
+      group_id: this.gid,
+      file,
+      name,
+      folder_id: pid,
+    });
+  }
+}
+
 export class NapCatGroup extends NapCatEntity implements Group {
   readonly dm = false;
   name: string;
+  fs: GroupFs;
 
   is_owner = false;
   is_admin = false;
@@ -179,6 +197,7 @@ export class NapCatGroup extends NapCatEntity implements Group {
                       public readonly gid: number) {
     super(client);
     this.logger = getLogger(`NapCatGroup - ${client.id} - ${gid}`);
+    this.fs = new NapCatGFS(client, gid);
   }
 
   public static async create(client: NapCatClient, gid: number) {
@@ -247,20 +266,6 @@ export class NapCatGroup extends NapCatEntity implements Group {
       return false;
     }
   }
-
-  fs: GroupFs = {
-    async upload(file: string | Buffer | Uint8Array, pid?: string, name?: string, callback?: (percentage: string) => void) {
-      if (typeof file !== 'string') {
-        throw new Error('TODO');
-      }
-      return await this.client.callApi('upload_group_file', {
-        group_id: this.gid,
-        file,
-        name,
-        folder_id: pid,
-      });
-    },
-  };
 
   async getAllMemberInfo() {
     // lib bug
