@@ -670,7 +670,7 @@ export default class ForwardService {
     try {
       const tempFiles: FileResult[] = [];
       let chain: (string | SendableElem)[] = [];
-      const senderId = Number(message.senderId || message.sender?.id) || helper.peerToId(message.peerId);
+      const senderId = Number(message.senderId || message.sender?.id) || pair.tgId;
       this.log.debug('senderId', senderId);
       // 这条消息在 tg 中被回复的时候显示的
       let brief = '', isSpoilerPhoto = false;
@@ -690,7 +690,7 @@ export default class ForwardService {
         if (message.sender instanceof Api.Channel && message.sender.broadcast) {
           emoji1 = '📢' + emoji1;
         }
-        else if (message.sender instanceof Api.Chat || message.sender instanceof Api.Channel || message.peerId instanceof Api.PeerChannel) {
+        else if (message.sender instanceof Api.Chat || message.sender instanceof Api.Channel || !message.senderId) {
           emoji1 = '👻' + emoji1;
         }
         messageHeader = emoji1 + messageHeader;
