@@ -670,10 +670,15 @@ export default class ForwardService {
     try {
       const tempFiles: FileResult[] = [];
       let chain: (string | SendableElem)[] = [];
-      const senderId = Number(message.senderId || message.sender?.id);
+      const senderId = Number(message.senderId || message.sender?.id) || helper.peerToId(message.peerId);
+      console.debug('senderId', senderId);
       // 这条消息在 tg 中被回复的时候显示的
       let brief = '', isSpoilerPhoto = false;
-      let messageHeader = helper.getUserDisplayName(message.sender) +
+      let userDisplayName = helper.getUserDisplayName(message.sender);
+      if (senderId === pair.tgId && !message.sender) {
+        userDisplayName = helper.getUserDisplayName(message.chat);
+      }
+      let messageHeader = userDisplayName +
         (message.forward ? ' 转发自 ' +
           // 要是隐私设置了，应该会有这个，然后下面两个都获取不到
           (message.fwdFrom?.fromName ||
@@ -681,7 +686,14 @@ export default class ForwardService {
           '');
       messageHeader += ': \n';
       if ((pair.flags | this.instance.flags) & flags.COLOR_EMOJI_PREFIX) {
-        messageHeader = emoji.tgColor((message.sender as Api.User)?.color?.color || message.senderId.toJSNumber()) + messageHeader;
+        let emoji1 = emoji.tgColor((message.sender as Api.User)?.color?.color || senderId);
+        if (message.sender instanceof Api.Channel && message.sender.broadcast) {
+          emoji1 = '📢' + emoji1;
+        }
+        else if (message.sender instanceof Api.Chat || message.sender instanceof Api.Channel || message.peerId instanceof Api.PeerChannel) {
+          emoji1 = '👻' + emoji1;
+        }
+        messageHeader = emoji1 + messageHeader;
       }
 
       this.crhPlayerInfo.delete(pair);

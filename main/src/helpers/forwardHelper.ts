@@ -248,4 +248,17 @@ export default {
     const url = new URL(`${env.WEB_ENDPOINT}/telegramAvatar/${instanceId}/${userId}`);
     return url.toString();
   },
+
+  peerToId(peer: Api.TypePeer) {
+    if (peer instanceof Api.PeerUser) {
+      return peer.userId.toJSNumber();
+    }
+    if (peer instanceof Api.PeerChat) {
+      return peer.chatId.toJSNumber();
+    }
+    if (peer instanceof Api.PeerChannel) {
+      return peer.channelId.toJSNumber();
+    }
+    return undefined;
+  },
 };
