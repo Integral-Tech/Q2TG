@@ -163,8 +163,10 @@ export default class ForwardController {
 
   private onTelegramParticipant = async (event: Api.UpdateChannelParticipant) => {
     try {
+      this.log.debug('收到 TG 群成员事件', event);
       const pair = this.instance.forwardPairs.find(event.channelId);
       if ((pair?.flags | this.instance.flags) & flags.DISABLE_JOIN_NOTICE) return false;
+      if (event.prevParticipant && !(event.prevParticipant instanceof Api.ChannelParticipantBanned)) return false;
       if (
         !(event.newParticipant instanceof Api.ChannelParticipantAdmin) &&
         !(event.newParticipant instanceof Api.ChannelParticipantCreator) &&
