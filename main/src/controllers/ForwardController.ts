@@ -110,6 +110,7 @@ export default class ForwardController {
       if (message.senderId?.eq(this.instance.botMe.id)) return true;
       if (!pair) return false;
       if ((pair.flags | this.instance.flags) & flags.DISABLE_TG2Q) return;
+      this.log.debug('收到 TG 消息', message);
       const qqMessagesSent = await this.forwardService.forwardFromTelegram(message, pair);
       if (qqMessagesSent) {
         // 更新数据库

@@ -38,7 +38,7 @@ export default class ConfigController {
   }
 
   private handleMessage = async (message: Api.Message) => {
-    if (!message.sender.id.eq(this.instance.owner)) {
+    if (!message.sender?.id?.eq(this.instance.owner)) {
       return false;
     }
     const messageSplit = message.message.split(' ');
