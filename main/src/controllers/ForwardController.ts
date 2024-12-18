@@ -19,6 +19,7 @@ import {
 
 } from '../client/QQClient';
 import posthog from '../models/posthog';
+import env from '../models/env';
 
 export default class ForwardController {
   private readonly forwardService: ForwardService;
@@ -210,6 +211,10 @@ export default class ForwardController {
       const operator = chat.pickMember(event.fromId);
       let operatorInfo = await operator.renew();
       operatorName = operatorInfo.card || operatorInfo.nickname;
+      if (!((pair.flags | this.instance.flags) & flags.DISABLE_RICH_HEADER) && env.WEB_ENDPOINT) {
+        const richHeaderUrl = helper.generateRichHeaderUrl(pair.apiKey, operatorInfo.user_id, operatorName);
+        operatorName = `<a href="${richHeaderUrl}">${operatorName}</a>`;
+      }
       if (event.fromId === event.targetId) {
         targetName = '自己';
       }
@@ -217,11 +222,16 @@ export default class ForwardController {
         const targetUser = chat.pickMember(event.targetId);
         let targetInfo = await targetUser.renew();
         targetName = targetInfo.card || targetInfo.nickname;
+        if (!((pair.flags | this.instance.flags) & flags.DISABLE_RICH_HEADER) && env.WEB_ENDPOINT) {
+          const richHeaderUrl = helper.generateRichHeaderUrl(pair.apiKey, targetInfo.user_id, targetName);
+          targetName = `<a href="${richHeaderUrl}">${targetName}</a>`;
+        }
       }
     }
     await pair.tg.sendMessage({
-      message: `<i><b>${operatorName}</b>${event.action}<b>${targetName}</b>${event.suffix}</i>`,
+      message: `<i><b>${operatorName}</b>${event.action || '戳了戳'}<b>${targetName}</b>${event.suffix || ''}</i>`,
       silent: true,
+      linkPreview: false,
     });
   };
 }
