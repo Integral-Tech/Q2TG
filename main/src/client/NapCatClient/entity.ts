@@ -80,7 +80,7 @@ export abstract class NapCatEntity implements QQEntity {
     }));
     if (source) {
       // TODO 不同框架 messageId / seq 不一样，无缝模式下不能交叉回复
-      message.push({
+      message.unshift({
         type: 'reply',
         data: {
           id: source.seq.toString(),
