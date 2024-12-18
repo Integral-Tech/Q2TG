@@ -671,7 +671,7 @@ export default class ForwardService {
       const tempFiles: FileResult[] = [];
       let chain: (string | SendableElem)[] = [];
       const senderId = Number(message.senderId || message.sender?.id) || helper.peerToId(message.peerId);
-      console.debug('senderId', senderId);
+      this.log.debug('senderId', senderId);
       // 这条消息在 tg 中被回复的时候显示的
       let brief = '', isSpoilerPhoto = false;
       let userDisplayName = helper.getUserDisplayName(message.sender);
