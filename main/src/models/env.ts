@@ -39,6 +39,7 @@ const configParsed = z.object({
   CRV_KEY: z.string().optional(),
 
   DISABLE_FILE_UPLOAD_TIP: z.string().transform((v) => ['true', '1', 'yes'].includes(v.toLowerCase())).default('false'),
+  IMAGE_SUMMARY: z.string().optional(),
 
   LISTEN_PORT: z.string().regex(/^\d+$/).transform(Number).default('8080'),
 
