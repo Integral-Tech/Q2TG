@@ -4,10 +4,10 @@ import { NapCatGroup } from '../client/NapCatClient';
 
 export default async function getAboutText(entity: Friend | Group, html: boolean) {
   let text: string;
-  if ('uid' in entity) {
+  if ('uin' in entity) {
     text = `<b>备注：</b>${entity.remark}\n` +
       `<b>昵称：</b>${entity.nickname}\n` +
-      `<b>账号：</b>${entity.uid}`;
+      `<b>账号：</b>${entity.uin}`;
   }
   else {
     let owner: GroupMemberInfo;

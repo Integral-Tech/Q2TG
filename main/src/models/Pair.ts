@@ -61,7 +61,7 @@ export class Pair {
   }
 
   get qqRoomId() {
-    return 'uid' in this.qq ? this.qq.uid : -this.qq.gid;
+    return 'uin' in this.qq ? this.qq.uin : -this.qq.gid;
   }
 
   get tgId() {

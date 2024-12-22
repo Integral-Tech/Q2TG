@@ -22,7 +22,7 @@ export interface QQEntity {
 }
 
 export interface QQUser extends QQEntity {
-  readonly uid: number;
+  readonly uin: number;
 }
 
 export interface Friend extends QQUser {
@@ -37,11 +37,11 @@ export interface Group extends QQEntity {
   readonly is_admin: boolean;
   readonly fs: GroupFs;
 
-  pickMember(uid: number, strict?: boolean): GroupMember;
+  pickMember(uin: number, strict?: boolean): GroupMember;
 
-  muteMember(uid: number, duration?: number): Promise<void>;
+  muteMember(uin: number, duration?: number): Promise<void>;
 
-  setCard(uid: number, card?: string): Promise<boolean>;
+  setCard(uin: number, card?: string): Promise<boolean>;
 
   announce(content: string): Promise<any>;
 }

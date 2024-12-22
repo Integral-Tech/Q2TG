@@ -10,12 +10,12 @@ export abstract class ChatEvent {
   }
 
   public get dm() {
-    return 'uid' in this.chat;
+    return 'uin' in this.chat;
   }
 
   public get chatId() {
-    if ('uid' in this.chat)
-      return this.chat.uid;
+    if ('uin' in this.chat)
+      return this.chat.uin;
     return -this.chat.gid;
   }
 }

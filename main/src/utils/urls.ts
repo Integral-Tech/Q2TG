@@ -4,8 +4,8 @@ import * as https from 'node:https';
 
 export function getAvatarUrl(room: number | bigint | Friend | Group): string {
   if (!room) return '';
-  if (typeof room === 'object' && 'uid' in room) {
-    room = room.uid;
+  if (typeof room === 'object' && 'uin' in room) {
+    room = room.uin;
   }
   if (typeof room === 'object' && 'gid' in room) {
     room = -room.gid;

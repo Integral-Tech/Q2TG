@@ -27,11 +27,11 @@ export default new Elysia()
       let profile: UserProfile, memberInfo: GroupMemberInfo;
       if (member instanceof OicqMember) {
         memberInfo = member.info;
-        profile = await member.client.getProfile(member.uid);
+        profile = await member.client.getProfile(member.uin);
       }
       else if (member instanceof NapCatGroupMember) {
         memberInfo = await member.renew();
-        const user = await member.client.pickFriend(member.uid) as NapCatFriend;
+        const user = await member.client.pickFriend(member.uin) as NapCatFriend;
         const info = await user.renew();
         profile = {
           // @ts-ignore

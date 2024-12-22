@@ -63,17 +63,17 @@ export default class ConfigService {
   }
 
   private async openFriendSelection(clazz: Friend[], name: string) {
-    clazz = clazz.filter(them => !this.instance.forwardPairs.find(them.uid));
+    clazz = clazz.filter(them => !this.instance.forwardPairs.find(them.uin));
     await (await this.owner).createPaginatedInlineSelector(`选择 QQ 好友\n分组：${name}`, clazz.map(e => [
-      Button.inline(`${e.remark || e.nickname} (${e.uid})`, this.tgBot.registerCallback(
+      Button.inline(`${e.remark || e.nickname} (${e.uin})`, this.tgBot.registerCallback(
         () => this.onSelectChatPersonal(e),
       )),
     ]));
   }
 
   private async onSelectChatPersonal(entity: Friend | Group) {
-    const roomId = 'uid' in entity ? entity.uid : -entity.gid;
-    const name = 'uid' in entity ? entity.remark || entity.nickname : entity.name;
+    const roomId = 'uin' in entity ? entity.uin : -entity.gid;
+    const name = 'uin' in entity ? entity.remark || entity.nickname : entity.name;
     const avatar = await getAvatar(roomId);
     const message = await (await this.owner).sendMessage({
       message: await getAboutText(entity, true),
@@ -124,16 +124,16 @@ export default class ConfigService {
     }
     if (!title) {
       // TS 这边不太智能
-      if ('uid' in room) {
+      if ('uin' in room) {
         title = room.remark || room.nickname;
       }
       else {
         title = room.name;
       }
     }
-    if (!title && this.oicq instanceof OicqClient && 'uid' in room && qqFromGroupId) {
+    if (!title && this.oicq instanceof OicqClient && 'uin' in room && qqFromGroupId) {
       // 可能是群临时
-      const info = await this.oicq.oicq.getGroupMemberInfo(qqFromGroupId, room.uid);
+      const info = await this.oicq.oicq.getGroupMemberInfo(qqFromGroupId, room.uin);
       title = info.card || info.nickname;
     }
     let isFinish = false;

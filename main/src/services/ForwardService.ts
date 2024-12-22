@@ -400,7 +400,7 @@ export default class ForwardService {
           case 'record': {
             url = elem.url;
             if (!url && pair.qq instanceof Contactable && elem.md5 === 'ntptt') {
-              url = await pair.qq.getNtVoiceUrl(elem.file as Buffer);
+              url = await pair.qq.getPttUrl(elem);
             }
             else if (!url && this.oicq instanceof OicqClient) {
               const refetchMessage = await this.oicq.oicq.getMsg(event.messageId);

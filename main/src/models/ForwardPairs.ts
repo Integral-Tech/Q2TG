@@ -47,7 +47,7 @@ export default class ForwardPairs {
   public async add(qq: Friend | Group, tg: TelegramChat, tgUser: TelegramChat, qqClient: QQClient, qqFromGroupId?: number) {
     const dbEntry = await db.forwardPair.create({
       data: {
-        qqRoomId: 'uid' in qq ? qq.uid : -qq.gid,
+        qqRoomId: 'uin' in qq ? qq.uin : -qq.gid,
         tgChatId: Number(tg.id),
         instanceId: this.instanceId,
         qqFromGroupId,
@@ -66,8 +66,8 @@ export default class ForwardPairs {
 
   public find(target: Friend | Group | TelegramChat | Entity | number | BigInteger) {
     if (!target) return null;
-    if (typeof target === 'object' && 'uid' in target) {
-      return this.pairs.find(e => 'uid' in e.qq && e.qq.uid === target.uid && e.qq.dm);
+    if (typeof target === 'object' && 'uin' in target) {
+      return this.pairs.find(e => 'uin' in e.qq && e.qq.uin === target.uin && e.qq.dm);
     }
     else if (typeof target === 'object' && 'gid' in target) {
       return this.pairs.find(e => 'gid' in e.qq && e.qq.gid === target.gid && !e.qq.dm);

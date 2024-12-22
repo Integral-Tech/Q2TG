@@ -32,9 +32,9 @@ export default class InChatCommandsService {
       });
       if (messageInfo) {
         let textToSend = '';
-        if ('uid' in pair.qq) {
+        if ('uin' in pair.qq) {
           if (Number(messageInfo.qqSenderId) === pair.qqRoomId) {
-            textToSend += `<b>发送者：</b>${pair.qq.remark || pair.qq.nickname}(<code>${pair.qq.uid}</code>)\n`;
+            textToSend += `<b>发送者：</b>${pair.qq.remark || pair.qq.nickname}(<code>${pair.qq.uin}</code>)\n`;
           }
           else {
             textToSend += `<b>发送者：</b>${this.oicq.nickname}(<code>${this.oicq.uin}</code>)\n`;
@@ -48,7 +48,7 @@ export default class InChatCommandsService {
           }
 
           textToSend += `<b>发送者：</b>${memberInfo.title ? `「<i>${memberInfo.title}</i>」` : ''}` +
-            `${memberInfo.card || memberInfo.nickname}(<code>${sender.uid}</code>)\n`;
+            `${memberInfo.card || memberInfo.nickname}(<code>${sender.uin}</code>)\n`;
           if (memberInfo.role !== 'member') {
             textToSend += `<b>职务：</b>${memberInfo.role === 'owner' ? '群主' : '管理员'}\n`;
           }

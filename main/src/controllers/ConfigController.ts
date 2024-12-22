@@ -125,14 +125,14 @@ export default class ConfigController {
     const pair = this.instance.forwardPairs.find(chat);
     if (pair) return false;
     // 如果正在创建中，应该阻塞
-    let promise = this.createPrivateMessageGroupBlockList.get(chat.uid);
+    let promise = this.createPrivateMessageGroupBlockList.get(chat.uin);
     if (promise) {
       await promise;
       return false;
     }
     // 有未创建转发群的新私聊消息时自动创建
     promise = this.configService.createGroupAndLink(chat, chat.remark || chat.nickname, true, undefined, message.tempChatFromGroupId);
-    this.createPrivateMessageGroupBlockList.set(chat.uid, promise);
+    this.createPrivateMessageGroupBlockList.set(chat.uin, promise);
     await promise;
     return false;
   };

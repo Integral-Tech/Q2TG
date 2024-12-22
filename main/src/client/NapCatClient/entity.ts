@@ -105,13 +105,13 @@ abstract class NapCatUser extends NapCatEntity implements QQUser {
   nickname: string;
 
   protected constructor(client: NapCatClient,
-                        public readonly uid: number) {
+                        public readonly uin: number) {
     super(client);
   }
 
   protected async sendMsgImpl(message: Send[keyof Send][], extra = {}): Promise<MessageRet> {
     const data = await this.client.callApi('send_private_msg', {
-      user_id: this.uid,
+      user_id: this.uin,
       ...extra,
       // @ts-ignore 库的问题
       message,
@@ -129,7 +129,7 @@ abstract class NapCatUser extends NapCatEntity implements QQUser {
       throw new Error('NapCat 不支持自己戳自己');
     }
     try {
-      await this.client.callApi('friend_poke', { user_id: this.uid });
+      await this.client.callApi('friend_poke', { user_id: this.uin });
       return true;
     }
     catch (e) {
@@ -161,7 +161,7 @@ export class NapCatFriend extends NapCatUser implements Friend {
   }
 
   async renew() {
-    const data = await this.client.callApi('get_stranger_info', { user_id: this.uid });
+    const data = await this.client.callApi('get_stranger_info', { user_id: this.uin });
     this.nickname = data.nickname;
     this.remark = data.remark;
     return data;
@@ -310,7 +310,7 @@ export class NapCatGroupMember extends NapCatUser implements GroupMember {
   async renew() {
     return await this.client.callApi('get_group_member_info', {
       group_id: this.gid,
-      user_id: this.uid,
+      user_id: this.uin,
     });
   }
 }
