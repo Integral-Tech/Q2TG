@@ -149,7 +149,6 @@ export default class Instance {
       this.aliveCheckController = new AliveCheckController(this, this.tgBot, this.tgUser, this.oicq);
       this.loadingController = new LoadingController(this, this.tgBot, this.tgUser, this.oicq);
       this.forwardPairs = await ForwardPairs.load(this.id, this.oicq, this.tgBot, this.tgUser);
-      await sleep(10000);
       this.setupCommands()
         .then(() => this.log.info('命令设置成功'))
         .catch(e => {
