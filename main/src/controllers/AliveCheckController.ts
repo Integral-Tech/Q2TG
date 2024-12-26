@@ -23,6 +23,7 @@ export default class AliveCheckController {
     await message.reply({
       message: await this.genMessage(this.instance.id === 0 ? Instance.instances : [this.instance]),
     });
+    return true;
   };
 
   private async genMessage(instances: Instance[]): Promise<string> {

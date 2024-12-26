@@ -25,6 +25,8 @@ import env from './env';
 import AliveCheckController from '../controllers/AliveCheckController';
 import { QQClient } from '../client/QQClient';
 import posthog from './posthog';
+import LoadingController from '../controllers/LoadingController';
+import { sleep } from 'telegram/Helpers';
 
 export default class Instance {
   public static readonly instances: Instance[] = [];
@@ -60,6 +62,7 @@ export default class Instance {
   private quotLyController: QuotLyController;
   private miraiSkipFilterController: MiraiSkipFilterController;
   private aliveCheckController: AliveCheckController;
+  private loadingController: LoadingController;
 
   private constructor(public readonly id: number) {
     this.log = getLogger(`Instance - ${this.id}`);
@@ -143,7 +146,10 @@ export default class Instance {
         });
         this.log.info('OICQ 登录完成');
       }
+      this.aliveCheckController = new AliveCheckController(this, this.tgBot, this.tgUser, this.oicq);
+      this.loadingController = new LoadingController(this, this.tgBot, this.tgUser, this.oicq);
       this.forwardPairs = await ForwardPairs.load(this.id, this.oicq, this.tgBot, this.tgUser);
+      await sleep(10000);
       this.setupCommands()
         .then(() => this.log.info('命令设置成功'))
         .catch(e => {
@@ -156,7 +162,6 @@ export default class Instance {
       this.oicqErrorNotifyController = new OicqErrorNotifyController(this, this.oicq);
       this.requestController = new RequestController(this, this.tgBot, this.oicq);
       this.configController = new ConfigController(this, this.tgBot, this.tgUser, this.oicq);
-      this.aliveCheckController = new AliveCheckController(this, this.tgBot, this.tgUser, this.oicq);
       this.deleteMessageController = new DeleteMessageController(this, this.tgBot, this.tgUser, this.oicq);
       this.miraiSkipFilterController = new MiraiSkipFilterController(this, this.tgBot, this.tgUser, this.oicq);
       this.inChatCommandsController = new InChatCommandsController(this, this.tgBot, this.tgUser, this.oicq);
@@ -167,6 +172,7 @@ export default class Instance {
       }
       this.fileAndFlashPhotoController = new FileAndFlashPhotoController(this, this.tgBot, this.oicq);
       this.isInit = true;
+      this.loadingController.off();
     })()
       .then(() => this.log.info('初始化已完成'));
   }
