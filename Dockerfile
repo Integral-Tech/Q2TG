@@ -21,6 +21,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 COPY pnpm-workspace.yaml package.json pnpm-lock.yaml .npmrc /app/
 COPY patches /app/patches
 COPY main/package.json /app/main/
+COPY ui/ /app/ui/
 
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store,sharing=locked \
     --mount=type=secret,id=npmrc,target=/root/.npmrc \
@@ -33,6 +34,7 @@ RUN cd main && pnpm run build
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store,sharing=locked \
     --mount=type=secret,id=npmrc,target=/root/.npmrc \
     pnpm deploy --filter=q2tg-main --prod deploy
+RUN cd ui && pnpm run build
 
 FROM debian:bookworm-slim AS tgs-to-gif-build
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
@@ -50,15 +52,6 @@ RUN sed -i 's/\${CONAN_LIBS}/z/g' CMakeLists.txt && sed -i 's/include(conanbuild
 
 RUN cmake CMakeLists.txt && make
 
-FROM base AS build-front
-COPY pnpm-workspace.yaml package.json pnpm-lock.yaml /app/
-COPY patches /app/patches
-COPY ui/ /app/ui/
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store,sharing=locked \
-    --mount=type=secret,id=npmrc,target=/root/.npmrc \
-    pnpm install --frozen-lockfile
-RUN cd ui && pnpm run build
-
 FROM base
 
 COPY --from=tgs-to-gif-build /app/tgs_to_gif /usr/local/bin/tgs_to_gif
@@ -67,7 +60,7 @@ ENV TGS_TO_GIF=/usr/local/bin/tgs_to_gif
 COPY --from=build /app/deploy /app
 COPY main/prisma /app/
 RUN pnpm exec prisma generate
-COPY --from=build-front /app/ui/dist /app/front
+COPY --from=build /app/ui/dist /app/front
 ENV UI_PATH=/app/front
 
 COPY docker-entrypoint.sh /app/entrypoint.sh
