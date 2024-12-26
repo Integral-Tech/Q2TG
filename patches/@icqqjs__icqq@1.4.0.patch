@@ -1,0 +1,136 @@
+diff --git a/lib/common.d.ts b/lib/common.d.ts
+index bdfe98c9920d99e7d86825fd1fa7a2761cf2903c..3f9e74673cb09d4197266588df4e4e621839deb9 100644
+--- a/lib/common.d.ts
++++ b/lib/common.d.ts
+@@ -52,5 +52,11 @@ export interface UserProfile {
+     signature: string;
+     /** 自定义的QID */
+     QID: string;
++    nickname: string;
++    country: string;
++    province: string;
++    city: string;
++    email: string;
++    birthday: [number, number, number];
+ }
+ export * from "./core/constants";
+diff --git a/lib/internal/internal.js b/lib/internal/internal.js
+index b2e1bd4492c0bd221c824fc106d3d27b3a360f93..25a4e62498e22b482eea861d94ef3f4fc7c66687 100644
+--- a/lib/internal/internal.js
++++ b/lib/internal/internal.js
+@@ -99,6 +99,14 @@ async function getUserProfile(uin = this.uin) {
+     });
+     // 有需要自己加！
+     return {
++        nickname: String(profile[20002]),
++        country: String(profile[20003]),
++        province: String(profile[20004]),
++        city: String(profile[20020]),
++        email: String(profile[20011]),
++        birthday: profile[20031].toBuffer().length === 4 ?
++            [profile[20031].toBuffer().slice(0,2).readUInt16BE(), profile[20031].toBuffer().slice(2,3).readUInt8(), profile[20031].toBuffer().slice(3).readUInt8()] :
++            undefined,
+         signature: String(profile[102]),
+         regTimestamp: profile[20026],
+         QID: String(profile[27394])
+diff --git a/lib/internal/onlinepush.js b/lib/internal/onlinepush.js
+index 1baa41012840c1144a4a6a7860c2bf424e627843..104eeab3b25947d6050060a8976889c94ee8900e 100644
+--- a/lib/internal/onlinepush.js
++++ b/lib/internal/onlinepush.js
+@@ -424,7 +424,7 @@ function groupMsgListener(payload) {
+             return;
+         msg = message_1.GroupMessage.combine(arr);
+     }
+-    if (msg.raw_message) {
++    if (true) {
+         const group = this.pickGroup(msg.group_id);
+         const member = group.pickMember(msg.sender.user_id);
+         msg.group = group;
+diff --git a/lib/internal/pbgetmsg.js b/lib/internal/pbgetmsg.js
+index 1b86d3ddaf64399381eea20bc12218d6f141fc8b..b908b9b984032e0797cb9861cd0979cf66606ccd 100644
+--- a/lib/internal/pbgetmsg.js
++++ b/lib/internal/pbgetmsg.js
+@@ -116,7 +116,7 @@ async function handleSyncMsg(proto) {
+     else {
+         this.stat.recv_msg_cnt++;
+         const msg = new message_1.PrivateMessage(proto, this.uin);
+-        if (msg.raw_message) {
++        if (true) {
+             msg.friend = this.pickFriend(msg.from_id);
+             if (msg.sub_type === "friend")
+                 msg.sender.nickname = msg.friend.info?.nickname || this.sl.get(msg.from_id)?.nickname || "";
+diff --git a/lib/message/converter.js b/lib/message/converter.js
+index ee196c553b0fabc4c8f9692526514c4724084664..2d22e8a60b3e17a383d999728d249dab2cb680dc 100644
+--- a/lib/message/converter.js
++++ b/lib/message/converter.js
+@@ -111,7 +111,7 @@ class Converter {
+             return;
+         }
+         if (qq === "all") {
+-            var q = 0, flag = 1, display = "全体成员";
++            var q = 0, flag = 1, display = text || "全体成员";
+         }
+         else {
+             var q = Number(qq), flag = 0, display = text || String(qq);
+@@ -121,7 +121,6 @@ class Converter {
+                 display = member?.card || member?.nickname || display;
+             }
+         }
+-        display = "@" + display;
+         if (dummy)
+             return this._text(display);
+         const buf = Buffer.allocUnsafe(6);
+@@ -540,10 +539,6 @@ class Converter {
+     quote(source) {
+         const elems = new Converter(source.message || "", this.ext).elems;
+         const tmp = this.brief;
+-        if (!this.ext?.dm) {
+-            this.at({ type: "at", qq: source.user_id });
+-            this.elems.unshift(this.elems.pop());
+-        }
+         this.elems.unshift({
+             45: {
+                 1: [source.seq],
+diff --git a/lib/message/message.d.ts b/lib/message/message.d.ts
+index aa1e33da90a9af6c996f06098f7c8acef66267c8..cd26789887d6d47fe6244a6d3ef11121978b6c4c 100644
+--- a/lib/message/message.d.ts
++++ b/lib/message/message.d.ts
+@@ -219,6 +219,7 @@ export declare class ForwardMessage implements Forwardable {
+     /** 消息内容 */
+     message: MessageElem[];
+     raw_message: string;
++    avatar?: string;
+     /** 反序列化一条转发消息 */
+     static deserialize(serialized: Buffer, nt?: boolean): ForwardMessage;
+     constructor(proto: pb.Proto, nt: boolean | undefined);
+diff --git a/lib/message/message.js b/lib/message/message.js
+index 7fa2d838e6d021b38a4864e9a8bf45f7e141421d..0642ce0965c57432ba9dc0a289cf0a0e6c31ca9f 100644
+--- a/lib/message/message.js
++++ b/lib/message/message.js
+@@ -403,22 +403,24 @@ class ForwardMessage {
+         if (nt) {
+             //proto[2][1]
+             const info = proto[1], head = proto[2];
+-            this.time = head[6] || 0;
++            this.time = head[6] || proto[2]?.[6] || 0;
+             this.seq = head[5];
+             this.user_id = info[1] || 0;
+             this.uid = info[2]?.toString() || "";
+             this.nickname = info[7]?.[6]?.toString() || info[8]?.[4]?.toString() || "";
+             this.group_id = info[8]?.[1];
++            this.avatar = head[20]?.[5]?.toString() || proto[2]?.[15]?.[5]?.toString();
+         }
+         else {
+             //proto[1][3]
+             const head = proto[1];
+-            this.time = head[6] || 0;
++            this.time = head[6] || proto[2]?.[6] || 0;
+             this.seq = head[5];
+             this.user_id = head[1] || 0;
+             this.uid = "";
+             this.nickname = head[14]?.toString() || head[9]?.[4]?.toString() || "";
+             this.group_id = head[9]?.[1];
++            this.avatar = head[20]?.[5]?.toString() || proto[2]?.[15]?.[5]?.toString();
+         }
+         this.parsed = (0, parser_1.parse)(proto[3][1]);
+         this.message = this.parsed.message;
