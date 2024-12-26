@@ -67,7 +67,7 @@ export default new Elysia()
               content={`https://q1.qlogo.cn/g?b=qq&nk=${params.userId}&s=0&time=${format(now, 'yyyy-MM-dd')}`}/>
         {
           memberInfo.title ?
-            <meta property="og:site_name" content={`「${memberInfo.title}」`}/> :
+            <meta property="og:site_name" content={`${memberInfo.role === 'member' ? '' : memberInfo.role}「${memberInfo.title}」`}/> :
             <meta property="og:site_name" content={memberInfo.role}/>
         }
         <meta property="og:title" content={memberInfo.card || memberInfo.nickname}/>
