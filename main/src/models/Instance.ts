@@ -27,6 +27,7 @@ import { QQClient } from '../client/QQClient';
 import posthog from './posthog';
 import LoadingController from '../controllers/LoadingController';
 import { sleep } from 'telegram/Helpers';
+import TypingController from '../controllers/TypingController';
 
 export default class Instance {
   public static readonly instances: Instance[] = [];
@@ -63,6 +64,7 @@ export default class Instance {
   private miraiSkipFilterController: MiraiSkipFilterController;
   private aliveCheckController: AliveCheckController;
   private loadingController: LoadingController;
+  private typingController: TypingController;
 
   private constructor(public readonly id: number) {
     this.log = getLogger(`Instance - ${this.id}`);
@@ -165,6 +167,7 @@ export default class Instance {
       this.miraiSkipFilterController = new MiraiSkipFilterController(this, this.tgBot, this.tgUser, this.oicq);
       this.inChatCommandsController = new InChatCommandsController(this, this.tgBot, this.tgUser, this.oicq);
       this.quotLyController = new QuotLyController(this, this.tgBot, this.oicq);
+      this.typingController = new TypingController(this, this.tgBot, this.tgUser, this.oicq);
       this.forwardController = new ForwardController(this, this.tgBot, this.tgUser, this.oicq);
       if (this.workMode === 'group') {
         this.hugController = new HugController(this, this.tgBot, this.oicq);

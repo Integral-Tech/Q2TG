@@ -114,3 +114,11 @@ export class PokeEvent extends ChatEvent {
     super(chat);
   }
 }
+
+export class InputStatusChangeEvent {
+  constructor(
+    public readonly chat: Friend,
+    public readonly typing: boolean,
+  ) {
+  }
+}

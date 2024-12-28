@@ -215,6 +215,15 @@ export default class TelegramChat {
     );
   }
 
+  public async setTyping(action: Api.TypeSendMessageAction = new Api.SendMessageTypingAction()) {
+    return await this.client.invoke(
+      new Api.messages.SetTyping({
+        peer: this.inputPeer,
+        action,
+      }),
+    );
+  }
+
   public async startImportSession(textFile: CustomFile, mediaCount: number) {
     await this.client.invoke(
       new Api.messages.CheckHistoryImportPeer({

@@ -27,7 +27,7 @@ import { pb } from '@icqqjs/icqq/lib/core';
 import env from '../models/env';
 import {
   CreateQQClientParamsBase, ForwardMessage, Friend, FriendIncreaseEvent, GroupMemberDecreaseEvent,
-  GroupMemberIncreaseEvent,
+  GroupMemberIncreaseEvent, InputStatusChangeEvent,
   MessageEvent, MessageRecallEvent, PokeEvent,
   QQClient,
 } from './QQClient';
@@ -121,6 +121,7 @@ export default class OicqClient extends QQClient {
           client.oicq.trap('notice.group.poke', client.onPoke);
           client.oicq.trap('request.friend', client.onFriendRequest);
           client.oicq.trap('request.group.invite', client.onGroupInvite);
+          client.oicq.trap('internal.input', client.onInput);
           client.isOnMessageCreated = true;
         }
 
@@ -227,6 +228,10 @@ export default class OicqClient extends QQClient {
 
   private onGroupInvite = async (event: GroupInviteEvent) => {
     await this.callHandlers(this.onGroupInviteHandlers, event);
+  };
+
+  private onInput = async (event: { user_id: number, end: boolean }) => {
+    await this.callHandlers(this.onInputStatusChangeHandlers, new InputStatusChangeEvent(await this.pickFriend(event.user_id), !event.end));
   };
 
   public async makeForwardMsgSelf(msglist: Forwardable[] | Forwardable, dm?: boolean): Promise<{
