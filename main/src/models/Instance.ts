@@ -28,6 +28,7 @@ import posthog from './posthog';
 import LoadingController from '../controllers/LoadingController';
 import { sleep } from 'telegram/Helpers';
 import TypingController from '../controllers/TypingController';
+import GroupNameRefreshController from '../controllers/GroupNameRefreshController';
 
 export default class Instance {
   public static readonly instances: Instance[] = [];
@@ -65,6 +66,7 @@ export default class Instance {
   private aliveCheckController: AliveCheckController;
   private loadingController: LoadingController;
   private typingController: TypingController;
+  private groupNameRefreshController: GroupNameRefreshController;
 
   private constructor(public readonly id: number) {
     this.log = getLogger(`Instance - ${this.id}`);
@@ -171,6 +173,9 @@ export default class Instance {
       this.forwardController = new ForwardController(this, this.tgBot, this.tgUser, this.oicq);
       if (this.workMode === 'group') {
         this.hugController = new HugController(this, this.tgBot, this.oicq);
+      }
+      else {
+        this.groupNameRefreshController = new GroupNameRefreshController(this, this.tgBot, this.tgUser, this.oicq);
       }
       this.fileAndFlashPhotoController = new FileAndFlashPhotoController(this, this.tgBot, this.oicq);
       this.isInit = true;

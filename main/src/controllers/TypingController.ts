@@ -10,12 +10,14 @@ export default class TypingController {
               private readonly tgUser: Telegram,
               private readonly oicq: QQClient) {
     oicq.addInputStatusChangeHandler(this.handleInputStatusChange);
+    // bot 无法获取输入状态，个人账号无法获取自己在其他设备的输入状态，做不了
+    // tgUser.addChannelUserTypingHandler(this.handleChannelUserTyping);
   }
 
   private handleInputStatusChange = async (event: InputStatusChangeEvent) => {
     const pair = this.instance.forwardPairs.find(event.chat);
     if (!pair) return;
-    if (pair.flags & flags.DISABLE_Q2TG) return;
+    if ((pair.flags | this.instance.flags) & flags.DISABLE_Q2TG) return;
 
     if (event.typing) {
       console.log(await pair.tg.setTyping())

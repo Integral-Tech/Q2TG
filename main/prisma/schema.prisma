@@ -21,7 +21,7 @@ model Session {
 
 model Entity {
   id        Int     @id @default(autoincrement())
-  // 源代码里面大概支持 string 和 BigInteger，不如先全都存 String
+  /// 源代码里面大概支持 string 和 BigInteger，不如先全都存 String
   entityId  String
   sessionId Int
   session   Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
@@ -80,10 +80,10 @@ model Message {
   instance       Instance @relation(fields: [instanceId], references: [id], onDelete: Cascade)
   tgFileId       BigInt?  @db.BigInt
   tgMessageText  String?
-  nick           String? // /抱 的时候会用到
+  nick           String? /// /抱 的时候会用到
   tgSenderId     BigInt?  @db.BigInt
   richHeaderUsed Boolean  @default(false)
-  ignoreDelete   Boolean  @default(false) // rmq rmt
+  ignoreDelete   Boolean  @default(false) /// rmq rmt
 
   @@index([qqRoomId, qqSenderId, seq, rand, pktnum, time, instanceId])
   @@index([tgChatId, tgMsgId, instanceId])
@@ -92,7 +92,7 @@ model Message {
 model ForwardPair {
   id              Int               @id @default(autoincrement())
   qqRoomId        BigInt            @db.BigInt
-  qqFromGroupId   BigInt?           @db.BigInt // 用于群临时
+  qqFromGroupId   BigInt?           @db.BigInt /// 用于群临时
   tgChatId        BigInt            @db.BigInt
   avatarCache     AvatarCache[]
   instanceId      Int               @default(0)

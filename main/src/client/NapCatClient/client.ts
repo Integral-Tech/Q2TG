@@ -1,4 +1,4 @@
-import { CreateQQClientParamsBase, Friend, FriendIncreaseEvent, Group, GroupMemberDecreaseEvent, GroupMemberIncreaseEvent, InputStatusChangeEvent, MessageEvent, MessageRecallEvent, PokeEvent, QQClient, SendableElem } from '../QQClient';
+import { CreateQQClientParamsBase, Friend, FriendIncreaseEvent, Group, GroupMemberDecreaseEvent, GroupMemberIncreaseEvent, GroupNameChangeEvent, InputStatusChangeEvent, MessageEvent, MessageRecallEvent, PokeEvent, QQClient, SendableElem } from '../QQClient';
 import random from '../../utils/random';
 import { getLogger, Logger } from 'log4js';
 import posthog from '../../models/posthog';
@@ -84,6 +84,9 @@ export class NapCatClient extends QQClient {
       await this.handlePoke(data);
     else if (data.post_type === 'notice' && data.notice_type === 'notify' && data.sub_type === 'input_status')
       await this.handleInput(data);
+    // @ts-ignore
+    else if (data.post_type === 'notice' && data.notice_type === 'notify' && data.sub_type === 'group_name')
+      await this.handleGroupNameChange(data);
     else if (data.post_type === 'request' && data.request_type === 'friend')
       await this.handleFriendRequest(data);
     else if (data.post_type === 'request' && data.request_type === 'group' && data.sub_type === 'invite')
@@ -166,6 +169,11 @@ export class NapCatClient extends QQClient {
 
   private async handleInput(data: WSReceiveHandler['notice.notify.input_status']) {
     await this.callHandlers(this.onInputStatusChangeHandlers, new InputStatusChangeEvent(await this.pickFriend(data.user_id), !!data.status_text));
+  }
+
+  private async handleGroupNameChange(data: { group_id: number; user_id: number; name_new: string }) {
+    const group = await this.pickGroup(data.group_id);
+    await this.callHandlers(this.onGroupNameChangeHandlers, new GroupNameChangeEvent(group, group.pickMember(data.user_id), data.name_new));
   }
 
   private async handleFriendRequest(data: WSReceiveHandler['request.friend']) {

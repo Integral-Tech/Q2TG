@@ -19,6 +19,7 @@ import env from '../models/env';
 
 type MessageHandler = (message: Api.Message) => Promise<boolean | void>;
 type ServiceMessageHandler = (message: Api.MessageService) => Promise<boolean | void>;
+type ChannelUserTypingHandler = (event: Api.UpdateChannelUserTyping) => Promise<boolean | void>;
 
 export default class Telegram {
   private readonly client: TelegramClient;
@@ -27,6 +28,7 @@ export default class Telegram {
   private readonly onMessageHandlers: Array<MessageHandler> = [];
   private readonly onEditedMessageHandlers: Array<MessageHandler> = [];
   private readonly onServiceMessageHandlers: Array<ServiceMessageHandler> = [];
+  private readonly onChannelUserTypingHandlers: Array<ChannelUserTypingHandler> = [];
   public me: Api.User;
 
   private static existedBots = {} as { [id: number]: Telegram };
@@ -95,6 +97,9 @@ export default class Telegram {
       types: [Api.UpdateNewMessage],
       func: (update: Api.UpdateNewMessage) => update.message instanceof Api.MessageService,
     }));
+    this.client.addEventHandler(this.onChannelUserTyping, new Raw({
+      types: [Api.UpdateChannelUserTyping],
+    }));
     this.client.addEventHandler(this.callbackQueryHelper.onCallbackQuery, new CallbackQuery());
     this.me = await this.client.getMe() as Api.User;
   }
@@ -117,6 +122,13 @@ export default class Telegram {
   private onServiceMessage = async (event: Api.UpdateNewMessage) => {
     for (const handler of this.onServiceMessageHandlers) {
       const res = await handler(event.message as Api.MessageService);
+      if (res) return;
+    }
+  };
+
+  private onChannelUserTyping = async (event: Api.UpdateChannelUserTyping) => {
+    for (const handler of this.onChannelUserTypingHandlers) {
+      const res = await handler(event);
       if (res) return;
     }
   };
@@ -150,6 +162,15 @@ export default class Telegram {
   public removeNewServiceMessageEventHandler(handler: ServiceMessageHandler) {
     this.onServiceMessageHandlers.includes(handler) &&
     this.onServiceMessageHandlers.splice(this.onServiceMessageHandlers.indexOf(handler), 1);
+  }
+
+  public addChannelUserTypingHandler(handler: ChannelUserTypingHandler) {
+    this.onChannelUserTypingHandlers.push(handler);
+  }
+
+  public removeChannelUserTypingHandler(handler: ChannelUserTypingHandler) {
+    this.onChannelUserTypingHandlers.includes(handler) &&
+    this.onChannelUserTypingHandlers.splice(this.onChannelUserTypingHandlers.indexOf(handler), 1);
   }
 
   public addDeletedMessageEventHandler(handler: (event: DeletedMessageEvent) => any) {

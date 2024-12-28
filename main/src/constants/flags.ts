@@ -16,6 +16,7 @@ enum flags {
   DISABLE_RICH_HEADER = 1 << 14,
   DISABLE_OFFLINE_NOTICE = 1 << 15,
   HIDE_ALL_QQ_NUMBER = 1 << 16,
+  NAME_LOCKED = 1 << 17,
 }
 
 export default flags;

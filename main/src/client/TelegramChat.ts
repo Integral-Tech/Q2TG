@@ -142,6 +142,17 @@ export default class TelegramChat {
     );
   }
 
+  public async editTitle(title: string) {
+    if (!(this.entity instanceof Api.Chat || this.entity instanceof Api.Channel))
+      throw new Error('不是群组，无法设置描述');
+    return await this.client.invoke(
+      new Api.channels.EditTitle({
+        channel: this.entity,
+        title,
+      }),
+    );
+  }
+
   public async getInviteLink() {
     if (!(this.entity instanceof Api.Chat || this.entity instanceof Api.Channel))
       throw new Error('不是群组，无法邀请');

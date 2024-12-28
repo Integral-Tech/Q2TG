@@ -3,7 +3,7 @@ import { Friend, Group, SendableElem } from './entity';
 import {
   FriendIncreaseEvent,
   GroupMemberDecreaseEvent,
-  GroupMemberIncreaseEvent, InputStatusChangeEvent,
+  GroupMemberIncreaseEvent, GroupNameChangeEvent, InputStatusChangeEvent,
   MessageEvent,
   MessageRecallEvent, PokeEvent,
 } from './events';
@@ -182,6 +182,18 @@ export abstract class QQClient {
   public removeInputStatusChangeHandler(handler: (e: InputStatusChangeEvent) => Promise<void | boolean>) {
     this.onInputStatusChangeHandlers.includes(handler) &&
     this.onInputStatusChangeHandlers.splice(this.onInputStatusChangeHandlers.indexOf(handler), 1);
+  }
+
+  //
+  protected readonly onGroupNameChangeHandlers: Array<(e: GroupNameChangeEvent) => Promise<void | boolean>> = [];
+
+  public addGroupNameChangeHandler(handler: (e: GroupNameChangeEvent) => Promise<void | boolean>) {
+    this.onGroupNameChangeHandlers.push(handler);
+  }
+
+  public removeGroupNameChangeHandler(handler: (e: GroupNameChangeEvent) => Promise<void | boolean>) {
+    this.onGroupNameChangeHandlers.includes(handler) &&
+    this.onGroupNameChangeHandlers.splice(this.onGroupNameChangeHandlers.indexOf(handler), 1);
   }
 
   // End Handlers
