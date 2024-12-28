@@ -42,6 +42,7 @@ import posthog from '../models/posthog';
 import { NapCatClient } from '../client/NapCatClient';
 import fsP from 'fs/promises';
 import regExps from '../constants/regExps';
+import qface from '../constants/qface';
 
 const NOT_CHAINABLE_ELEMENTS = ['flash', 'record', 'video', 'location', 'share', 'json', 'xml', 'poke'];
 const IMAGE_MIMES = ['image/jpeg', 'image/png', 'image/apng', 'image/webp', 'image/gif', 'image/bmp', 'image/tiff', 'image/x-icon', 'image/avif', 'image/heic', 'image/heif'];
@@ -287,12 +288,17 @@ export default class ForwardService {
           case 'face':
             // 判断 tgs 表情
             const tgs = this.getStickerByQQFaceId(elem.id as number);
-            if (tgs && event.message.filter(it => it.type !== 'at').length === 1) {
+            if (tgs && chain.length === 1) {
               useSticker(tgs);
             }
           case 'sface': {
             if (typeof elem.text !== 'string') {
-              elem.text = '表情:' + elem.id;
+              if (qface[elem.id]) {
+                elem.text = qface[elem.id];
+              }
+              else {
+                elem.text = '表情:' + elem.id;
+              }
             }
             message += `[<i>${helper.htmlEscape(elem.text)}</i>]`;
             break;
