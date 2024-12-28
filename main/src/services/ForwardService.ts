@@ -43,6 +43,7 @@ import { NapCatClient } from '../client/NapCatClient';
 import fsP from 'fs/promises';
 import regExps from '../constants/regExps';
 import qface from '../constants/qface';
+import qfaceChannelMap from '../constants/qfaceChannelMap';
 
 const NOT_CHAINABLE_ELEMENTS = ['flash', 'record', 'video', 'location', 'share', 'json', 'xml', 'poke'];
 const IMAGE_MIMES = ['image/jpeg', 'image/png', 'image/apng', 'image/webp', 'image/gif', 'image/bmp', 'image/tiff', 'image/x-icon', 'image/avif', 'image/heic', 'image/heif'];
@@ -300,7 +301,12 @@ export default class ForwardService {
                 elem.text = '表情:' + elem.id;
               }
             }
-            message += `[<i>${helper.htmlEscape(elem.text)}</i>]`;
+            if (qfaceChannelMap[elem.id]) {
+              message += `[<i><a href="https://t.me/qq_face/${qfaceChannelMap[elem.id]}">${helper.htmlEscape(elem.text)}</a></i>]`;
+            }
+            else {
+              message += `[<i>${helper.htmlEscape(elem.text)}</i>]`;
+            }
             break;
           }
           case 'bface': {
