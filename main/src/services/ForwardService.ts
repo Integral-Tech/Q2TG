@@ -420,9 +420,18 @@ export default class ForwardService {
               url = (refetchMessage.message.find(it => it.type === 'record') as PttElem).url;
             }
             if (url) {
+              let bufSilk: Buffer;
+              if (this.oicq instanceof NapCatClient) {
+                const ret = await this.oicq.callApi('download_file', { url });
+                bufSilk = await fsP.readFile(ret.file);
+                fsP.unlink(ret.file);
+              }
+              else {
+                bufSilk = await fetchFile(url);
+              }
               const temp = await createTempFile({ postfix: '.ogg' });
               tempFiles.push(temp);
-              await silk.decode(await fetchFile(url), temp.path);
+              await silk.decode(bufSilk, temp.path);
               files.push(temp.path);
             }
             else {
