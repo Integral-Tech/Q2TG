@@ -104,7 +104,7 @@ export default class ForwardService {
 
   private getStickerByQQFaceId(id: number) {
     for (const [pack, ids] of Object.entries(lottie.packInfo)) {
-      if (ids.includes(id as any)) {
+      if (ids.includes(id)) {
         if (this.stickerPackMap[pack])
           return this.stickerPackMap[pack][ids.indexOf(id)] as Api.Document;
       }
@@ -134,7 +134,7 @@ export default class ForwardService {
         buttons: ButtonLike[] = [],
         replyTo = 0,
         forceDocument = false,
-        isContainAt = false;
+        isContainAtOrChannelFace = false;
       let messageHeader = '', messageHeaderWithLink = '', sender = '';
       if (!event.dm) {
         // 产生头部，这和工作模式没有关系
@@ -282,13 +282,13 @@ export default class ForwardService {
             }
             if (env.WEB_ENDPOINT && typeof elem.qq === 'number' && !((pair.flags | this.instance.flags) & flags.DISABLE_RICH_HEADER)) {
               message += `<a href="${helper.generateRichHeaderUrl(pair.apiKey, elem.qq)}">[<i>${helper.htmlEscape(elem.text)}</i>]</a>`;
-              isContainAt = true;
+              isContainAtOrChannelFace = true;
               break;
             }
           }
           case 'face':
             // 判断 tgs 表情
-            const tgs = this.getStickerByQQFaceId(elem.id as number);
+            const tgs = this.getStickerByQQFaceId(Number(elem.id));
             if (tgs && chain.length === 1) {
               useSticker(tgs);
             }
@@ -303,6 +303,7 @@ export default class ForwardService {
             }
             if (qfaceChannelMap[elem.id]) {
               message += `[<i><a href="https://t.me/qq_face/${qfaceChannelMap[elem.id]}">${helper.htmlEscape(elem.text)}</a></i>]`;
+              isContainAtOrChannelFace = true;
             }
             else {
               message += `[<i>${helper.htmlEscape(elem.text)}</i>]`;
@@ -560,7 +561,7 @@ export default class ForwardService {
       }
       else if (!event.dm && !((pair.flags | this.instance.flags) & flags.DISABLE_RICH_HEADER) && env.WEB_ENDPOINT
         // 当消息包含链接时不显示 RICH HEADER
-        && (isContainAt || !isContainsUrl(message))) {
+        && (isContainAtOrChannelFace || !isContainsUrl(message))) {
         // 没有文件时才能显示链接预览
         richHeaderUsed = true;
         // https://github.com/tdlib/td/blob/437c2d0c6e0ad104022d5ad86ddc8aedc41cb7a8/td/telegram/MessageContent.cpp#L2575
@@ -573,7 +574,7 @@ export default class ForwardService {
         });
         messageToSend.linkPreview = { showAboveText: true };
       }
-      else if (!isContainAt && isContainsUrl(message)) {
+      else if (!isContainAtOrChannelFace && isContainsUrl(message)) {
         // 手动找出需要 preview 的 url，防止 preview richHeader 的 url
         const urls = message.match(regExps.url);
         if (urls?.length) {
