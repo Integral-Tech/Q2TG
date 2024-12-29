@@ -76,6 +76,9 @@ export default class ConfigController {
               await this.oicq.oicq.login();
             }
             return true;
+          case '/refresh_all':
+            await this.configService.refreshAll();
+            return true;
         }
       }
       else {

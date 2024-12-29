@@ -41,6 +41,10 @@ const personalPrivateCommands = [
     command: 'addgroup',
     description: '添加新的群转发',
   }),
+  new Api.BotCommand({
+    command: 'refresh_all',
+    description: '刷新所有头像和简介',
+  }),
 ];
 
 // 服务器零号实例的管理员

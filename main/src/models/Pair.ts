@@ -5,6 +5,8 @@ import getAboutText from '../utils/getAboutText';
 import { md5 } from '../utils/hashing';
 import { getAvatar } from '../utils/urls';
 import db from './db';
+import flags from '../constants/flags';
+import { NapCatGroup } from '../client/NapCatClient';
 
 const log = getLogger('ForwardPair');
 
@@ -48,6 +50,22 @@ export class Pair {
     const lastHash = avatarCache ? avatarCache.hash : null;
     const avatar = await getAvatar(this.qqRoomId);
     const newHash = md5(avatar);
+    try {
+      await this._tg.editAbout(await getAboutText(this.qq, false));
+    }
+    catch (e) {
+      log.error(`修改群简介失败: ${e.message}`);
+    }
+    if (!(this.flags & flags.NAME_LOCKED) && this.qq instanceof NapCatGroup) {
+      const info = await this.qq.renew();
+      try {
+        await this._tg.editTitle(info.group_name);
+      }
+      catch (e) {
+        log.error(`修改群名失败: ${e.message}`);
+      }
+    }
+
     if (!lastHash || Buffer.from(lastHash).compare(newHash) !== 0) {
       log.debug(`更新群头像: ${this.qqRoomId}`);
       await this._tg.setProfilePhoto(avatar);
@@ -57,7 +75,6 @@ export class Pair {
         create: { forwardPairId: this.dbId, hash: newHash },
       });
     }
-    await this._tg.editAbout(await getAboutText(this.qq, false));
   }
 
   get qqRoomId() {

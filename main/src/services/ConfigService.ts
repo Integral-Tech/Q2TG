@@ -324,4 +324,32 @@ export default class ConfigService {
       }
     }
   }
+
+  public async refreshAll() {
+    const statusMessage = await (await this.owner).sendMessage('正在刷新所有头像和简介…');
+    const pairs = this.instance.forwardPairs.getAll();
+    let succ = 0, fail = 0;
+    for (let i = 0; i < pairs.length; i++) {
+      const pair = pairs[i];
+      try {
+        await pair.updateInfo();
+        succ++;
+      }
+      catch (e) {
+        this.log.error(`刷新 ${pair.dbId} 头像和简介失败`, e);
+        posthog.capture('刷新头像和简介失败', { error: e });
+        fail++;
+      }
+      try{
+        await statusMessage.edit({
+          text: `正在刷新所有头像和简介…\n成功：${succ}，失败：${fail}，总数：${pairs.length}`,
+        });
+      }
+      catch {
+      }
+    }
+    await statusMessage.edit({
+      text: `刷新完成\n成功：${succ}，失败：${fail}，总数：${pairs.length}`,
+    });
+  }
 }

@@ -97,4 +97,8 @@ export default class ForwardPairs {
       }
     }
   }
+
+  public getAll() {
+    return this.pairs;
+  }
 }
