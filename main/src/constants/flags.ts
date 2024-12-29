@@ -17,6 +17,7 @@ enum flags {
   DISABLE_OFFLINE_NOTICE = 1 << 15,
   HIDE_ALL_QQ_NUMBER = 1 << 16,
   NAME_LOCKED = 1 << 17,
+  ALWAYS_FORWARD_TG_FILE = 1 << 18,
 }
 
 export default flags;

@@ -836,7 +836,7 @@ export default class ForwardService {
         useText(`文件：${fileNameAttribute ? fileNameAttribute.fileName : ''}\n` +
           `类型：${file.mimeType}\n` +
           `大小：${file.size}`);
-        if (file.size.leq(50 * 1024 * 1024)) {
+        if (file.size.leq(50 * 1024 * 1024) || (pair.flags | this.instance.flags) & flags.ALWAYS_FORWARD_TG_FILE) {
           useText('\n');
           const file = await createTempFile();
           tempFiles.push(file);
