@@ -837,11 +837,11 @@ export default class ForwardService {
           `类型：${file.mimeType}\n` +
           `大小：${file.size}`);
         if (file.size.leq(50 * 1024 * 1024)) {
-          chain.push('\n');
+          useText('\n');
+          const file = await createTempFile();
+          tempFiles.push(file);
+          useText('文件正在上传中…');
           if ('gid' in pair.qq) {
-            useText('文件正在上传中…');
-            const file = await createTempFile();
-            tempFiles.push(file);
             await message.downloadMedia({ outputFile: file.path });
             pair.qq.fs.upload(file.path, '/',
               fileNameAttribute ? fileNameAttribute.fileName : 'file')
@@ -851,19 +851,13 @@ export default class ForwardService {
               })
               .finally(() => file.cleanup());
           }
-          else if (pair.qq instanceof OicqFriend) {
-            useText('文件正在上传中…');
-            pair.qq.sendFile(await message.downloadMedia({}),
-              fileNameAttribute ? fileNameAttribute.fileName : 'file')
+          else {
+            await message.downloadMedia({ outputFile: file.path });
+            pair.qq.sendFile(file.path, fileNameAttribute ? fileNameAttribute.fileName : 'file')
               .catch(err => {
                 message.reply({ message: `上传失败：\n${err.message}` });
                 posthog.capture('上传好友文件失败', { error: err });
               });
-          }
-          else {
-            await message.reply({
-              message: '当前配置不支持好友文件',
-            });
           }
         }
         brief += '[文件]';

@@ -28,6 +28,8 @@ export interface QQUser extends QQEntity {
 export interface Friend extends QQUser {
   readonly nickname: string;
   readonly remark: string;
+
+  sendFile(file: string, filename: string): Promise<string>;
 }
 
 export interface Group extends QQEntity {

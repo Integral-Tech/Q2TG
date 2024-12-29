@@ -166,6 +166,15 @@ export class NapCatFriend extends NapCatUser implements Friend {
     this.remark = data.remark;
     return data;
   }
+
+  async sendFile(file: string, filename: string): Promise<string> {
+    await this.client.callApi('upload_private_file', {
+      user_id: this.uin,
+      file,
+      name: filename,
+    });
+    return filename;
+  }
 }
 
 class NapCatGFS implements GroupFs {
