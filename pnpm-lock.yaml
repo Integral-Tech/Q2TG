@@ -140,6 +140,9 @@ importers:
       prompts:
         specifier: ^2.4.2
         version: 2.4.2
+      reconnecting-websocket:
+        specifier: ^4.4.0
+        version: 4.4.0
       telegram:
         specifier: ^2.26.8
         version: 2.26.8(patch_hash=6ezi5zx3h54zaimfvrhyk2gpfa)
@@ -3030,6 +3033,9 @@ packages:
 
   real-cancellable-promise@1.2.0:
     resolution: {integrity: sha512-FYhmx1FVSgoPRjneoTjh+EKZcNb8ijl/dyatTzase5eujYhVrLNDOiIY6AgQq7GU1kOoLgEd9jLVbhFg8k8dOQ==}
+
+  reconnecting-websocket@4.4.0:
+    resolution: {integrity: sha512-D2E33ceRPga0NvTDhJmphEgJ7FUYF0v4lr1ki0csq06OdlxKfugGzN0dSkxM/NfqCxYELK4KcaTOUOjTV6Dcng==}
 
   regenerator-runtime@0.13.11:
     resolution: {integrity: sha512-kY1AZVr2Ra+t+piVaJ4gxaFaReZVH40AKNo7UCX6W+dEwBo/2oZJzqfuN1qLq1oL45o56cPaTXELwrTh8Fpggg==}
@@ -6651,6 +6657,8 @@ snapshots:
   readdirp@4.0.2: {}
 
   real-cancellable-promise@1.2.0: {}
+
+  reconnecting-websocket@4.4.0: {}
 
   regenerator-runtime@0.13.11: {}
 

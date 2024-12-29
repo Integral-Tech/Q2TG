@@ -44,6 +44,7 @@
     "nodejs-base64": "^2.0.0",
     "posthog-node": "^4.3.1",
     "prompts": "^2.4.2",
+    "reconnecting-websocket": "^4.4.0",
     "telegram": "^2.26.8",
     "tmp-promise": "^3.0.3",
     "tsx": "^4.19.2",

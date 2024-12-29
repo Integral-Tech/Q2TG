@@ -7,6 +7,7 @@ import { NapCatFriend, NapCatGroup } from './entity';
 import { napCatReceiveToMessageElem } from './convert';
 import { NapCatFriendRequestEvent, NapCatGroupEvent, NapCatGroupInviteEvent } from './event';
 import type { ImageElem } from '@icqqjs/icqq';
+import ReconnectingWebSocket from 'reconnecting-websocket';
 
 export interface CreateNapCatParams extends CreateQQClientParamsBase {
   type: 'napcat';
@@ -17,11 +18,11 @@ export class NapCatClient extends QQClient {
   private constructor(id: number, private readonly wsUrl: string) {
     super(id);
     this.logger = getLogger(`NapCatClient - ${id}`);
-    this.ws = new WebSocket(wsUrl);
+    this.ws = new ReconnectingWebSocket(wsUrl);
     this.ws.onmessage = (e) => this.handleWebSocketMessage(e.data);
   }
 
-  private readonly ws: WebSocket;
+  private readonly ws: ReconnectingWebSocket;
   private readonly logger: Logger;
 
   public static async create(params: CreateNapCatParams) {
